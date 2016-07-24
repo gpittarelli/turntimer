@@ -1,16 +1,17 @@
+/*eslint-env node*/
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: './client/index.js',
   output: {
     path: 'dist',
-    filename: 'client.js'
+    filename: 'client.js',
   },
   module: {
     loaders: [
       { test: /\.css$/, loader: 'style!css' },
-      { test: /\.js$/, exclude: /node_modules/, loader: 'babel' }
-    ]
+      { test: /\.js$/, exclude: /node_modules/, loader: 'babel' },
+    ],
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -20,7 +21,7 @@ module.exports = {
         collapseWhitespace: true,
         minifyCSS: true,
         minifyJS: true,
-      }
-    })
-  ]
+      },
+    }),
+  ],
 };
