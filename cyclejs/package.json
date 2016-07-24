@@ -1,0 +1,31 @@
+{
+  "name": "turntimer-cylcejs",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server/server.js --exec babel-node",
+    "build": "cross-env NODE_ENV=production webpack -p",
+    "dev": "webpack-dev-server --content-base dist",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@cycle/dom": "11.0.1",
+    "@cycle/xstream-run": "3.0.3",
+    "babel-cli": "6.11.4",
+    "babel-loader": "6.2.4",
+    "babel-polyfill": "6.9.1",
+    "babel-preset-es2015": "6.9.0",
+    "babel-preset-es2016": "6.11.3",
+    "babel-preset-stage-3": "6.11.0",
+    "babel-register": "6.11.5",
+    "cross-env": "2.0.0",
+    "express": "4.14.0",
+    "html-webpack-plugin": "2.22.0",
+    "localenv": "0.2.2",
+    "nodemon": "1.9.2",
+    "rimraf": "2.5.4",
+    "webpack": "1.13.1",
+    "webpack-dev-server": "1.14.1",
+    "xstream": "5.3.2"
+  }
+}
