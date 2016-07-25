@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@cycle/dom": "11.0.1",
+    "@cycle/http": "9.0.3",
     "@cycle/xstream-run": "3.0.3",
     "babel-cli": "6.11.4",
     "babel-eslint": "6.1.2",
