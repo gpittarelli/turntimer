@@ -1,13 +1,29 @@
 import 'localenv';
 import 'babel-polyfill';
+import express, {Router} from 'express';
 import createDebug from 'debug';
 const debug = createDebug('server');
 
-import express from 'express';
+const groups = {};
+function createGroup(id, turnTime=60) {
+  return {
+    id,
+    turnTime,
+    users: [],
+  };
+}
+
+const apiRoutes = Router();
+apiRoutes.get('/', (req, res) => res.send('API'));
+
+apiRoutes.post('/group/:id', ({query: {name}, params: {id}}, res) => {
+  groups[id] = createGroup(id);
+  res.send(groups[id]);
+});
 
 const server = express();
-
 server.get('/', (req, res) => res.send('Hello World'));
+server.use('/api', apiRoutes);
 
 const port = +process.env.PORT || 8080;
 server.listen(port);
