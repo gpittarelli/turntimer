@@ -3,6 +3,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: './client/index.js',
+  publicPath: ',',
   output: {
     path: 'dist',
     filename: 'client.js',
