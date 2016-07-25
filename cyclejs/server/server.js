@@ -1,5 +1,5 @@
-require('localenv');
-require('babel-polyfill');
+import 'localenv';
+import 'babel-polyfill';
 
 import express from 'express';
 
