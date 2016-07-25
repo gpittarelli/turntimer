@@ -1,5 +1,7 @@
 import 'localenv';
 import 'babel-polyfill';
+import createDebug from 'debug';
+const debug = createDebug('server');
 
 import express from 'express';
 
