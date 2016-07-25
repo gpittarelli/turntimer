@@ -7,4 +7,6 @@ const server = express();
 
 server.get('/', (req, res) => res.send('Hello World'));
 
-server.listen(8081);
+const port = +process.env.PORT || 8080;
+server.listen(port);
+debug(`Listening on ${port}`);
