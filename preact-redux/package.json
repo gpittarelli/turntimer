@@ -2,6 +2,8 @@
   "name": "turntimer-preact-redux",
   "version": "0.0.1",
   "main": "index.js",
+  "license": "GPL-3.0",
+  "repository": "gpittareli/turntimer",
   "scripts": {
     "start": "nodemon server/server.js --exec babel-node",
     "build": "webpack",

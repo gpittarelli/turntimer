@@ -1,6 +1,8 @@
 {
   "name": "turntimer-cylcejs",
   "version": "0.0.1",
+  "license": "GPL-3.0",
+  "repository": "gpittareli/turntimer",
   "main": "index.js",
   "scripts": {
     "start": "cross-env PORT=8081 nodemon server/server.js --exec babel-node --ignore client",
