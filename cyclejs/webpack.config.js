@@ -1,8 +1,11 @@
 /*eslint-env node*/
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
+var isDev = process.env.NODE_ENV !== 'production';
+
 module.exports = {
   entry: './client/index.js',
+  devtool: (isDev? 'inline-' : '') + 'source-map',
   output: {
     path: 'dist',
     filename: 'client.js',
