@@ -4,6 +4,7 @@ import {div, a, h1, makeDOMDriver} from '@cycle/dom';
 import {makeRouterDriver} from 'cyclic-router';
 import {createHistory} from 'history';
 import {makeHTTPDriver} from '@cycle/http';
+import {fromPairs} from 'ramda';
 
 import Home from './home';
 
@@ -22,11 +23,9 @@ function view({...sources, router}) {
     '*': Home,
   }).map(({path, value}) => value({...sources, router: router.path(path)}));
 
-  return {
-    DOM: match$.map(c => c.DOM).flatten(),
-    HTTP: xs.of({url: '/asdf'}),
-    router: xs.never(),
-  };
+  return fromPairs(['DOM', 'HTTP', 'router'].map(
+    sink => [sink, match$.map(c => c[sink] || xs.never()).flatten()]
+  ));
 }
 
 run(view, {
