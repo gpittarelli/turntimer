@@ -29,6 +29,7 @@ module.exports = {
     }),
   ],
   devServer: {
+    stats: {chunks: false},
     historyApiFallback: true,
     contentBase: 'dist',
     proxy: {'/api/*': {target: 'http://localhost:8081'}},
