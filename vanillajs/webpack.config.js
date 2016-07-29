@@ -1,14 +1,20 @@
+/*eslint-env node*/
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+
+var isDev = process.env.NODE_ENV !== 'production';
 
 module.exports = {
   entry: './client/index.js',
+  devtool: (isDev? 'inline-' : '') + 'source-map',
   output: {
     path: 'dist',
-    filename: 'dist/client.js'
+    filename: 'client.js',
+    publicPath: '/',
   },
   module: {
     loaders: [
-      { test: /\.css$/, loader: 'style!css' }
+      { test: /\.css$/, loader: 'style!css' },
+      { test: /\.js$/, exclude: /node_modules/, loader: 'babel' },
     ]
   },
   plugins: [
@@ -21,5 +27,10 @@ module.exports = {
         minifyJS: true,
       }
     })
-  ]
+  ],
+  devServer: {
+    historyApiFallback: true,
+    contentBase: 'dist',
+    proxy: {'/api/*': {target: 'http://localhost:8081'}},
+  },
 };
