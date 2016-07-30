@@ -1,6 +1,7 @@
 import 'localenv';
 import 'babel-polyfill';
 import express, {Router} from 'express';
+import logger from 'connect-logger';
 import createDebug from 'debug';
 const debug = createDebug('server');
 
@@ -22,6 +23,8 @@ apiRoutes.post('/group/:id', ({query: {name}, params: {id}}, res) => {
 });
 
 const server = express();
+server.use(logger())
+
 server.get('/', (req, res) => res.send('Hello World'));
 server.use('/api', apiRoutes);
 

@@ -26,6 +26,7 @@
     "babel-preset-es2016": "6.11.3",
     "babel-preset-stage-3": "6.11.0",
     "babel-register": "6.11.5",
+    "connect-logger": "0.0.1",
     "cross-env": "2.0.0",
     "cyclic-router": "2.1.2",
     "debug": "2.2.0",
