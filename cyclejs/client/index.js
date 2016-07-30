@@ -1,6 +1,7 @@
-import xs from 'xstream';
-import {run} from '@cycle/xstream-run';
+import most from 'most';
+import Cycle from '@cycle/most-run';
 import {div, a, h1, makeDOMDriver} from '@cycle/dom';
+import isolate from '@cycle/isolate';
 import {makeRouterDriver} from 'cyclic-router';
 import {createHistory} from 'history';
 import {makeHTTPDriver} from '@cycle/http';
@@ -10,7 +11,7 @@ import Home from './home';
 
 function secondPage({id}) {
   return {
-    DOM: xs.of(div([
+    DOM: most.of(div([
       a({attrs: {href: '/'}}, 'Back home'),
       h1(`Other page, ${id}`),
     ])),
@@ -18,17 +19,19 @@ function secondPage({id}) {
 }
 
 function view({...sources, router}) {
-  const match$ = router.define({
+  const page = router.define({
     '/group/:id': id => sources => secondPage({...sources, id}),
     '*': Home,
-  }).map(({path, value}) => value({...sources, router: router.path(path)}));
+  }).map(({path, value}) =>
+           isolate(value)({...sources, router: router.path(path)}))
+    .multicast();
 
   return fromPairs(['DOM', 'HTTP', 'router'].map(
-    sink => [sink, match$.map(c => c[sink] || xs.never()).flatten()]
+    sink => [sink, page.map(c => c[sink] || most.never()).switch()]
   ));
 }
 
-run(view, {
+Cycle.run(view, {
   DOM: makeDOMDriver('#app-container'),
   router: makeRouterDriver(createHistory(), {capture: true}),
   HTTP: makeHTTPDriver(),
