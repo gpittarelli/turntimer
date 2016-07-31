@@ -1,11 +1,9 @@
 import most from 'most';
 import {div, a, label, input, button} from '@cycle/dom';
-import {path} from 'ramda';
+import {prop} from 'ramda';
 import mavi from './mavi';
+import {toArray, eventValue} from './helpers';
 import debug from 'debug';
-
-const toArray = (...args) => args;
-const eventValue = (ev) => ev.target.value;
 
 function intent({DOM}) {
   const name$ = DOM.select('.name').events('input').map(eventValue),
@@ -27,8 +25,8 @@ function model({HTTP, name$, groupId$, joinGroup$}) {
       joinGroup$.map(() => true).startWith(false)
     ).map(([name, groupId, click]) => !(name && groupId) || click),
     joinButtonClicked$: most.combine(toArray, name$, groupId$, joinGroup$),
-    groupCreated$: HTTP.select('join-group').switch()
-      .tap(debug('a')).map(path(['body', 'id'])),
+    groupCreated$: HTTP.select('join-group').switch().map(prop('body')),
+    name$,
   };
 }
 
@@ -41,14 +39,15 @@ function view({joinButtonEnabled$}) {
   ]));
 }
 
-function actions({groupCreated$, joinButtonClicked$}) {
+function actions({name$, groupCreated$, joinButtonClicked$}) {
   return {
     HTTP: joinButtonClicked$.map(([name, groupId]) => ({
       method: 'POST',
       url: `/api/group/${groupId}?name=${name}`,
       category: 'join-group',
     })),
-    router: groupCreated$.map(id => `/group/${id}`),
+    router: most.combine(toArray, name$, groupCreated$)
+      .map(([name, {id}]) => `/group/${id}/player/${name}`),
   };
 }
 
