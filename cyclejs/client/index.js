@@ -7,6 +7,7 @@ import {createHistory} from 'history';
 import {makeHTTPDriver} from '@cycle/http';
 import {fromPairs} from 'ramda';
 
+import makeStateDriver from './stateDriver';
 import Home from './home';
 import Group from './group';
 
@@ -14,6 +15,7 @@ const drivers = {
   DOM: makeDOMDriver('#app-container'),
   router: makeRouterDriver(createHistory(), {capture: true}),
   HTTP: makeHTTPDriver(),
+  player: makeStateDriver(),
 };
 
 function view({...sources, router}) {
