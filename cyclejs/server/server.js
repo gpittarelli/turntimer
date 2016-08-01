@@ -1,7 +1,7 @@
 import 'localenv';
 import 'babel-polyfill';
 import express, {Router} from 'express';
-import logger from 'connect-logger';
+import morgan from 'morgan';
 import createDebug from 'debug';
 const debug = createDebug('server');
 
@@ -23,7 +23,7 @@ apiRoutes.post('/group/:id', ({query: {name}, params: {id}}, res) => {
 });
 
 const server = express();
-server.use(logger())
+server.use(morgan('dev'));
 
 server.get('/', (req, res) => res.send('Hello World'));
 server.use('/api', apiRoutes);
