@@ -1,0 +1,9 @@
+:host = http://localhost:8081
+:group-id = 123
+:username = bob
+
+# Create a group
+POST :host/api/group/:group-id
+
+# Create a player in a group
+POST :host/api/group/:group-id/player/:username
