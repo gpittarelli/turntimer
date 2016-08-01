@@ -5,7 +5,7 @@ import morgan from 'morgan';
 import createDebug from 'debug';
 const debug = createDebug('server');
 
-const groups = {};
+const groups = new Map();
 function createGroup(id, turnTime=60) {
   return {
     id,
@@ -18,12 +18,10 @@ function createUser(name) {
   return {name};
 }
 
-const groupExists = id => groups.hasOwnProperty(id);
-
 const groupRoutes = Router({mergeParams: true});
 
 function requireGroup({params: {id}}, res, next) {
-  if (groupExists(id)) {
+  if (groups.has(id)) {
     next();
   } else {
     res.sendStatus(404);
@@ -31,13 +29,15 @@ function requireGroup({params: {id}}, res, next) {
 }
 
 groupRoutes.post('/', ({params: {id}}, res) => {
-  groups[id] = createGroup(id);
-  res.send(groups[id]);
+  if (!groups.has(id)) {
+    groups.set(id, createGroup(id));
+  }
+  res.send(groups.get(id));
 });
 
 groupRoutes.post('/player/:name', requireGroup, ({params: {id, name}}, res) => {
   const newUser = createUser(name);
-  groups[id].users.push(newUser);
+  groups.get(id).users.push(newUser);
   res.send(newUser);
 });
 
