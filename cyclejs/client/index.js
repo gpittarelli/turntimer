@@ -20,8 +20,7 @@ const drivers = {
 
 function view({...sources, router}) {
   const page = router.define({
-    '/group/:id/player/:name': (id, name) =>
-       sources => Group({...sources, id, name}),
+    '/group/:id': id => sources => Group({...sources, id}),
     '*': Home,
   }).map(({path, value}) =>
            isolate(value)({...sources, router: router.path(path)}))

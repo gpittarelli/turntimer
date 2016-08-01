@@ -1,32 +1,33 @@
 import most from 'most';
 import {div, a, h1} from '@cycle/dom';
 import mavi from './mavi';
-import debug from 'debug';
+import {toArray} from './helpers';
 
 const intent = () => ({});
 
-function model({HTTP, id, name}) {
-  HTTP.select('join-group').tap(debug('x'));
+function model({player: player$, id}) {
   return {
-    group$: most.of({id, name}),
+    group$: most.of({id}),
+    player$: player$,
   };
 }
 
-function view({group$}) {
-  return  group$.map(({id, name}) => div([
+function view({group$, player$}) {
+  return most.combine(toArray, group$, player$).map(([{id}, {name}]) => div([
     a({attrs: {href: '/'}}, 'Back home'),
     h1(`Welcome to group ${id}, ${name}!`),
   ]));
 }
 
-function actions({group$}) {
+function act({player$, group$}) {
   return {
-    HTTP: group$.map(({id, name}) => ({
-      method: 'get',
-      uri: `/api/group/${id}/player/${name}`,
+    HTTP: most.combine(toArray, group$, player$).map(([{id}, {name}]) => ({
+      method: 'post',
+      url: `/api/group/${id}/player/${name}`,
       category: 'join-group',
     })),
+    player: most.never(),
   };
 }
 
-export default mavi(model, actions, view, intent);
+export default mavi(model, act, view, intent);
