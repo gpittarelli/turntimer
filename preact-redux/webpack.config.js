@@ -15,7 +15,7 @@ module.exports = {
     loaders: [
       { test: /\.css$/, loader: 'style!css' },
       { test: /\.js$/, exclude: /node_modules/, loader: 'babel' },
-    ]
+    ],
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -25,10 +25,11 @@ module.exports = {
         collapseWhitespace: true,
         minifyCSS: true,
         minifyJS: true,
-      }
-    })
+      },
+    }),
   ],
   devServer: {
+    stats: {chunks: false, version: false, hash: false, children: false},
     historyApiFallback: true,
     contentBase: 'dist',
     proxy: {'/api/*': {target: 'http://localhost:8081'}},
