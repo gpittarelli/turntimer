@@ -35,10 +35,22 @@ groupRoutes.post('/', ({params: {id}}, res) => {
   res.send(groups.get(id));
 });
 
+groupRoutes.get('/', requireGroup,
+                ({params: {id}}, res) => res.send(groups.get(id)));
+
 groupRoutes.post('/player/:name', requireGroup, ({params: {id, name}}, res) => {
   const newUser = createUser(name);
   groups.get(id).users.push(newUser);
   res.send(newUser);
+});
+
+groupRoutes.get('/player/:name', requireGroup, ({params: {id, name}}, res) => {
+  const user = groups.get(id).users.filter(u => u.name === name)[0];
+  if (user) {
+    res.send(user);
+  } else {
+    res.sendStatus(404);
+  }
 });
 
 const apiRoutes = Router({mergeParams: true});

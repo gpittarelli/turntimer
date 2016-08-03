@@ -5,5 +5,11 @@
 # Create a group
 POST :host/api/group/:group-id
 
+# Get a group
+GET :host/api/group/:group-id
+
 # Create a player in a group
 POST :host/api/group/:group-id/player/:username
+
+# Get a player in a group
+GET :host/api/group/:group-id/player/:username
