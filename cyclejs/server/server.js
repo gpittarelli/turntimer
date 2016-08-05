@@ -5,13 +5,19 @@ import morgan from 'morgan';
 import createDebug from 'debug';
 const debug = createDebug('server');
 
+const seconds = () => Math.round(Date.now() / 1000);
+
 const groups = new Map();
 function createGroup(id, turnTime=60) {
-  return {
+  let a = seconds();
+  const group = {
     id,
     turnTime,
+    get timeLeft() {return 60 - ((seconds() - a) % 60);},
     users: [],
   };
+
+  return group;
 }
 
 function createUser(name) {
