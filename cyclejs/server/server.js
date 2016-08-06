@@ -2,22 +2,34 @@ import 'localenv';
 import 'babel-polyfill';
 import express, {Router} from 'express';
 import morgan from 'morgan';
+import most from 'most';
+import hold from '@most/hold';
+import toPromise from '../lib/toPromise';
 import createDebug from 'debug';
 const debug = createDebug('server');
 
 const seconds = () => Math.round(Date.now() / 1000);
 
+const tick$ = hold(most.periodic(1000, ''));
+
 const groups = new Map();
 function createGroup(id, turnTime=60) {
   let a = seconds();
-  const group = {
-    id,
-    turnTime,
-    get timeLeft() {return 60 - ((seconds() - a) % 60);},
-    users: [],
-  };
 
-  return group;
+  return hold(tick$.map(() => {
+    return {
+      id,
+      turnTime,
+      timeLeft: 60 - ((seconds() - a) % 60),
+      users: [],
+    };
+  }));
+}
+
+async function getGroup(id) {
+  if (groups.has(id)) {
+    return await toPromise(groups.get(id).take(1));
+  }
 }
 
 function createUser(name) {
@@ -34,6 +46,12 @@ function requireGroup({params: {id}}, res, next) {
   }
 }
 
+function wrap(routeFn) {
+  return (req, res, next) => {
+    routeFn(req, res, next).catch(next);
+  }
+}
+
 groupRoutes.post('/', ({params: {id}}, res) => {
   if (!groups.has(id)) {
     groups.set(id, createGroup(id));
@@ -41,8 +59,11 @@ groupRoutes.post('/', ({params: {id}}, res) => {
   res.send(groups.get(id));
 });
 
-groupRoutes.get('/', requireGroup,
-                ({params: {id}}, res) => res.send(groups.get(id)));
+groupRoutes.get('/', requireGroup, wrap(async ({params: {id}}, res) => {
+  console.log('hi', getGroup(id));
+  const group = await getGroup(id);
+  res.send(group);
+}));
 
 groupRoutes.post('/player/:name', requireGroup, ({params: {id, name}}, res) => {
   const newUser = createUser(name);
