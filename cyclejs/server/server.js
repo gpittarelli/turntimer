@@ -4,31 +4,46 @@ import express, {Router} from 'express';
 import morgan from 'morgan';
 import most from 'most';
 import hold from '@most/hold';
+import EventEmitter from 'events';
 import toPromise from '../lib/toPromise';
 import createDebug from 'debug';
 const debug = createDebug('server');
 
 const seconds = () => Math.round(Date.now() / 1000);
 
-const tick$ = hold(most.periodic(1000, ''));
+const tick$ = most.periodic(1000, '').map(seconds);
 
 const groups = new Map();
 function createGroup(id, turnTime=60) {
-  let a = seconds();
+  const userEvents = new EventEmitter(),
+    startTime = seconds(),
+    users$ = hold(
+      most.fromEvent('join', userEvents)
+        .scan((acc, newUser) => {
+          if (acc.filter(u => u.name === newUser.name).length > 0) {
+            return acc;
+          }
+          return acc.concat(newUser)
+        }, [])
+    );
+  users$.drain();
 
-  return hold(tick$.map(() => {
-    return {
-      id,
-      turnTime,
-      timeLeft: 60 - ((seconds() - a) % 60),
-      users: [],
-    };
-  }));
+  return {
+    join: u => userEvents.emit('join', u),
+    data: most.combine(Array.of, tick$, users$).map(([now, users]) => {
+      return {
+        id,
+        turnTime,
+        timeLeft: 60 - ((now - startTime) % 60),
+        users,
+      };
+    }),
+  }
 }
 
 async function getGroup(id) {
   if (groups.has(id)) {
-    return await toPromise(groups.get(id).take(1));
+    return await toPromise(groups.get(id).data.take(1));
   }
 }
 
@@ -52,33 +67,32 @@ function wrap(routeFn) {
   }
 }
 
-groupRoutes.post('/', ({params: {id}}, res) => {
+groupRoutes.post('/', wrap(async ({params: {id}}, res) => {
   if (!groups.has(id)) {
     groups.set(id, createGroup(id));
   }
-  res.send(groups.get(id));
-});
+  res.send(await getGroup(id));
+}));
 
 groupRoutes.get('/', requireGroup, wrap(async ({params: {id}}, res) => {
-  console.log('hi', getGroup(id));
-  const group = await getGroup(id);
-  res.send(group);
+  res.send(await getGroup(id));
 }));
 
 groupRoutes.post('/player/:name', requireGroup, ({params: {id, name}}, res) => {
   const newUser = createUser(name);
-  groups.get(id).users.push(newUser);
+  groups.get(id).join(newUser);
   res.send(newUser);
 });
 
-groupRoutes.get('/player/:name', requireGroup, ({params: {id, name}}, res) => {
-  const user = groups.get(id).users.filter(u => u.name === name)[0];
+groupRoutes.get('/player/:name', requireGroup, wrap( async({params: {id, name}}, res) => {
+  const group = await getGroup(id),
+    user = group.users.filter(u => u.name === name)[0];
   if (user) {
     res.send(user);
   } else {
     res.sendStatus(404);
   }
-});
+}));
 
 const apiRoutes = Router({mergeParams: true});
 apiRoutes.get('/', (req, res) => res.send('API'));
