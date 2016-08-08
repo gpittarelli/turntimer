@@ -1,6 +1,7 @@
 import 'localenv';
 import 'babel-polyfill';
 import express, {Router} from 'express';
+import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import most from 'most';
 import hold from '@most/hold';
@@ -100,6 +101,7 @@ apiRoutes.use('/group/:id', groupRoutes);
 
 const server = express();
 server.use(morgan('dev'));
+server.use(bodyParser.json());
 
 server.get('/', (req, res) => res.send('Hello World'));
 server.use('/api', apiRoutes);
