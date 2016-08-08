@@ -2,6 +2,7 @@ import 'localenv';
 import 'babel-polyfill';
 import express, {Router} from 'express';
 import bodyParser from 'body-parser';
+import {merge} from 'ramda';
 import morgan from 'morgan';
 import most from 'most';
 import hold from '@most/hold';
@@ -19,18 +20,31 @@ function createGroup(id, turnTime=60) {
   const userEvents = new EventEmitter(),
     startTime = seconds(),
     users$ = hold(
-      most.fromEvent('join', userEvents)
-        .scan((acc, newUser) => {
-          if (acc.filter(u => u.name === newUser.name).length > 0) {
-            return acc;
-          }
-          return acc.concat(newUser)
-        }, [])
+      most.merge(
+        most.fromEvent('join', userEvents)
+          .map(newUser => users => {
+            if (users.filter(u => u.name === newUser.name).length === 0) {
+              return users.concat(newUser)
+            }
+            return users;
+          }),
+
+        most.fromEvent('update', userEvents)
+          .map(([{name}, update]) => users => {
+            const idx = Object.entries(users)
+              .filter(([,{thisName}]) => thisName === name)[0][0];
+            if (idx) {
+              users[idx] = update(users[idx]);
+            }
+            return users;
+          }),
+      ).scan((users, update) => update(users), [])
     );
-  users$.drain();
+  users$.drain().then(()=>1, err => console.error(err));
 
   return {
     join: u => userEvents.emit('join', u),
+    update: (user, update) => userEvents.emit('update', user, update),
     data: most.combine(Array.of, tick$, users$).map(([now, users]) => {
       return {
         id,
@@ -93,6 +107,11 @@ groupRoutes.get('/player/:name', requireGroup, wrap( async({params: {id, name}},
   } else {
     res.sendStatus(404);
   }
+}));
+
+groupRoutes.patch('/player/:name/update', requireGroup, wrap( async({...req, params: {id, name}, body}, res) => {
+  groups.get(id).update(name, u => merge(u, body))
+  res.sendStatus(204);
 }));
 
 const apiRoutes = Router({mergeParams: true});
