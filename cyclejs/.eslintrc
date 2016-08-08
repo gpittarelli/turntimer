@@ -7,7 +7,8 @@
   },
   "rules": {
     "comma-dangle": ["error", "always-multiline"],
-    "no-shadow": "error"
+    "no-shadow": "error",
+    "no-console": ["error", {allow: ["warn", "error"]}]
   },
   "env": {
     "es6": true
