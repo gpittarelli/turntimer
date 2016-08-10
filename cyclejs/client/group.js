@@ -40,16 +40,12 @@ function view({group$, playerName$, joinState$}) {
     )));
 
   return most.combineArray(Array.of, [
-    group$, userList$, playerName$,
-    joinStateUI$, joinState$.startWith('Loading'),
-  ]).map(([{...group, id}, userList, name, joinStateUI, joinState]) => div([
+    group$, userList$, joinStateUI$,
+  ]).map(([{timeLeft}, userList, joinStateUI]) => div([
     a({attrs: {href: '/'}}, 'Back home'),
     ...joinStateUI,
-    h1(`Welcome to group ${id}, ${name}!`),
-    div(JSON.stringify(joinState)),
-    div(group ? JSON.stringify(group) : 'none'),
+    div('.turn-time', timeLeft),
     userList,
-    button('.ready', 'Ready'),
     button('.end-turn', 'End Turn'),
   ]));
 }
