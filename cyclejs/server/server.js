@@ -36,27 +36,17 @@ function createGroup(id, turnTime=60) {
           }
           return users;
         }),
-    ).scan((users, update) => update(users), [])),
-    state$ = hold(
-      users$
-        .filter(u => u.length > 0)
-        .map(users => users.every(prop('ready')))
-        .startWith(false)
-        .map(cond([
-          [equals(true), always('ready')],
-          [equals(false), always('waiting')],
-        ]))
-    );
+    ).scan((users, update) => update(users), []));
 
-  state$.drain().then(()=>1, err => console.error(err));
+  users$.drain().then(()=>1, err => console.error(err));
 
   return {
     join: u => userEvents.emit('join', u),
     update: (user, update) => userEvents.emit('update', user, update),
-    data: most.combine(Array.of, tick$, users$, state$).map(([now, users, state]) => {
+    data: most.combine(Array.of, tick$, users$).map(([now, users]) => {
       return {
         id,
-        state,
+        state: users.length > 0 && users.every(prop('ready')) ? 'ready' : 'waiting',
         turnTime,
         timeLeft: 60 - ((now - startTime) % 60),
         users,
