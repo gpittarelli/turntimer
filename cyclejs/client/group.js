@@ -34,6 +34,21 @@ const styles = StyleSheet.create({
       cursor: 'pointer',
     },
   },
+  timer: {
+    margin: '10%',
+    fontSize: '25vw',
+    display: 'block',
+    textAlign: 'center',
+  },
+  userList: {
+    textAlign: 'center',
+  },
+  endTurn: {
+    margin: '2em auto 0',
+    width: '75%',
+    display: 'block',
+    height: '5%',
+  },
   active: {
     color: 'red',
   },
@@ -79,7 +94,9 @@ function view({group$, playerName$, joinState$}) {
   ).startWith([h1('Loading')]);
 
   const userList$ = group$.combine(Array.of, playerName$)
-    .map(([{users, activeTurn}, ourName]) => ul(users.map(
+    .map(([{users, activeTurn}, ourName]) => ul({
+      class: {[css(styles.userList)]: true},
+    }, users.map(
       ({name, ready}, idx) => li([
         idx === activeTurn ? ARROW : '',
         span({
@@ -106,9 +123,9 @@ function view({group$, playerName$, joinState$}) {
   }, [
     backButton,
     ...joinStateUI,
-    div('.turn-time', timeLeft),
+    div('.turn-time', {class: {[css(styles.timer)]: true}}, timeLeft),
     userList,
-    button('.end-turn', 'End Turn'),
+    button('.end-turn', {class: {[css(styles.endTurn)]: true}}, 'End Turn'),
   ]));
 }
 
