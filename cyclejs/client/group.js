@@ -1,6 +1,6 @@
 import most from 'most';
-import {div, a, h1, ul, li, button} from '@cycle/dom';
-import {nthArg} from 'ramda';
+import {div, a, h1, ul, li, button, span} from '@cycle/dom';
+import {nthArg, identity} from 'ramda';
 import mavi from './mavi';
 import {toArray} from './helpers';
 
@@ -30,13 +30,14 @@ function view({group$, playerName$, joinState$}) {
     () => []
   ).startWith([h1('Loading')]);
 
-  const userList$ = group$.map(({users, activeTurn}) => ul(users.map(
-    ({name, ready}, idx) => li([
-      idx === activeTurn ? ARROW : '',
-      name,
-      ready ? CHECK : '',
-    ])
-  )));
+  const userList$ = group$.combine(Array.of, playerName$)
+    .map(([{users, activeTurn}, ourName]) => ul(users.map(
+      ({name, ready}, idx) => li([
+        idx === activeTurn ? ARROW : '',
+        (name === ourName ? span.bind(null, '.us') : identity)(name),
+        ready ? CHECK : '',
+      ])
+    )));
 
   return most.combineArray(Array.of, [
     group$, userList$, playerName$,
