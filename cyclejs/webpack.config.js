@@ -4,7 +4,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var isDev = process.env.NODE_ENV !== 'production';
 
 module.exports = {
-  entry: './client/index.js',
+  entry: ['./client/index.js', './client/style.css'],
   devtool: (isDev? 'inline-' : '') + 'source-map',
   output: {
     path: 'dist',
