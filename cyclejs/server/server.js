@@ -2,7 +2,7 @@ import 'localenv';
 import 'babel-polyfill';
 import express, {Router} from 'express';
 import bodyParser from 'body-parser';
-import {merge} from 'ramda';
+import {merge, prop, cond, equals, always} from 'ramda';
 import morgan from 'morgan';
 import most from 'most';
 import hold from '@most/hold';
@@ -19,35 +19,44 @@ const groups = new Map();
 function createGroup(id, turnTime=60) {
   const userEvents = new EventEmitter(),
     startTime = seconds(),
-    users$ = hold(
-      most.merge(
-        most.fromEvent('join', userEvents)
-          .map(newUser => users => {
-            if (users.filter(u => u.name === newUser.name).length === 0) {
-              return users.concat(newUser)
-            }
-            return users;
-          }),
-
-        most.fromEvent('update', userEvents)
-          .map(([{name}, update]) => users => {
-            const idx = Object.entries(users)
-              .filter(([,{thisName}]) => thisName === name)[0][0];
-            if (idx) {
-              users[idx] = update(users[idx]);
-            }
-            return users;
-          }),
-      ).scan((users, update) => update(users), [])
+    users$ = hold(most.merge(
+      most.fromEvent('join', userEvents)
+        .map(newUser => users => {
+          if (users.filter(u => u.name === newUser.name).length === 0) {
+            return users.concat(newUser)
+          }
+          return users;
+        }),
+      most.fromEvent('update', userEvents)
+        .map(([{name}, update]) => users => {
+          const idx = Object.entries(users)
+            .filter(([,{thisName}]) => thisName === name)[0][0];
+          if (idx) {
+            users[idx] = update(users[idx]);
+          }
+          return users;
+        }),
+    ).scan((users, update) => update(users), [])),
+    state$ = hold(
+      users$
+        .filter(u => u.length > 0)
+        .map(users => users.every(prop('ready')))
+        .startWith(false)
+        .map(cond([
+          [equals(true), always('ready')],
+          [equals(false), always('waiting')],
+        ]))
     );
-  users$.drain().then(()=>1, err => console.error(err));
+
+  state$.drain().then(()=>1, err => console.error(err));
 
   return {
     join: u => userEvents.emit('join', u),
     update: (user, update) => userEvents.emit('update', user, update),
-    data: most.combine(Array.of, tick$, users$).map(([now, users]) => {
+    data: most.combine(Array.of, tick$, users$, state$).map(([now, users, state]) => {
       return {
         id,
+        state,
         turnTime,
         timeLeft: 60 - ((now - startTime) % 60),
         users,
