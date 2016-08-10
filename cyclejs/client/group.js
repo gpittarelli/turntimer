@@ -1,8 +1,15 @@
 import most from 'most';
 import {div, a, h1, ul, li, button, span} from '@cycle/dom';
-import {nthArg, identity} from 'ramda';
+import {StyleSheet, css} from 'aphrodite/no-important';
+import {nthArg} from 'ramda';
 import mavi from './mavi';
 import {toArray} from './helpers';
+
+const styles = StyleSheet.create({
+  active: {
+    color: 'red',
+  },
+});
 
 const CHECK = '\u2713',
   ARROW = '\u21E8';
@@ -34,7 +41,11 @@ function view({group$, playerName$, joinState$}) {
     .map(([{users, activeTurn}, ourName]) => ul(users.map(
       ({name, ready}, idx) => li([
         idx === activeTurn ? ARROW : '',
-        (name === ourName ? span.bind(null, '.us') : identity)(name),
+        span({
+          class: {
+            [css(styles.active)]: name === ourName,
+          },
+        }, name),
         ready ? CHECK : '',
       ])
     )));
