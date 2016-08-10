@@ -19,6 +19,7 @@ const groups = new Map();
 function createGroup(id, turnTime=60) {
   const userEvents = new EventEmitter(),
     startTime = seconds(),
+    activeTurn$ = hold(most.fromEvent('endTurn', userEvents).scan(inc, 0)),
     users$ = hold(most.merge(
       most.fromEvent('join', userEvents)
         .map(newUser => users => {
@@ -39,19 +40,23 @@ function createGroup(id, turnTime=60) {
     ).scan((users, update) => update(users), []));
 
   users$.drain().then(()=>1, err => console.error(err));
+  activeTurn$.drain().then(()=>1, err => console.error(err));
 
   return {
     join: u => userEvents.emit('join', u),
     update: (user, update) => userEvents.emit('update', user, update),
-    data: most.combine(Array.of, tick$, users$).map(([now, users]) => {
-      return {
-        id,
-        state: users.length > 0 && users.every(prop('ready')) ? 'ready' : 'waiting',
-        turnTime,
-        timeLeft: 60 - ((now - startTime) % 60),
-        users,
-      };
-    }),
+    endTurn: u => userEvents.emit('endTurn', u),
+    data: most.combine(Array.of, tick$, users$, activeTurn$)
+      .map(([now, users, activeTurn]) => {
+        return {
+          id,
+          activeTurn: activeTurn % users.length,
+          state: users.length > 0 && users.every(prop('ready')) ? 'ready' : 'waiting',
+          turnTime,
+          timeLeft: 60 - ((now - startTime) % 60),
+          users,
+        };
+      }),
   };
 }
 
@@ -106,6 +111,11 @@ groupRoutes.get('/player/:name', requireGroup, wrap( async({params: {id, name}},
 
 groupRoutes.patch('/player/:name/update', requireGroup, wrap(async({...req, params: {id, name}, body}, res) => {
   groups.get(id).update(name, u => merge(u, body));
+  res.sendStatus(204);
+}));
+
+groupRoutes.post('/player/:name/endTurn', requireGroup, wrap(async({...req, params: {id, name}, body}, res) => {
+  groups.get(id).endTurn(name);
   res.sendStatus(204);
 }));
 
