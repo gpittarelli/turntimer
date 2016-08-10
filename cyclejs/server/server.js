@@ -2,7 +2,7 @@ import 'localenv';
 import 'babel-polyfill';
 import express, {Router} from 'express';
 import bodyParser from 'body-parser';
-import {merge, prop, cond, equals, always} from 'ramda';
+import {merge, prop, inc} from 'ramda';
 import morgan from 'morgan';
 import most from 'most';
 import hold from '@most/hold';
@@ -23,7 +23,7 @@ function createGroup(id, turnTime=60) {
       most.fromEvent('join', userEvents)
         .map(newUser => users => {
           if (users.filter(u => u.name === newUser.name).length === 0) {
-            return users.concat(newUser)
+            return users.concat(newUser);
           }
           return users;
         }),
@@ -52,7 +52,7 @@ function createGroup(id, turnTime=60) {
         users,
       };
     }),
-  }
+  };
 }
 
 async function getGroup(id) {
@@ -75,11 +75,7 @@ function requireGroup({params: {id}}, res, next) {
   }
 }
 
-function wrap(routeFn) {
-  return (req, res, next) => {
-    routeFn(req, res, next).catch(next);
-  }
-}
+const wrap = routeFn => (req, res, next) => routeFn(req, res, next).catch(next);
 
 groupRoutes.post('/', wrap(async ({params: {id}}, res) => {
   if (!groups.has(id)) {
