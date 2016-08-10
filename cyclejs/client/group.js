@@ -20,6 +20,7 @@ function model({player: player$, id, HTTP, DOM}) {
     player$: most.combine(Array.of, group$, playerName$)
       .map(([{users}, name]) => users.filter(u => u.name === name)[0]),
     toggleReady$: DOM.select('.ready').events('click'),
+    endTurn$: DOM.select('.end-turn').events('click'),
   };
 }
 
@@ -43,10 +44,11 @@ function view({group$, playerName$, joinState$}) {
     div(group ? JSON.stringify(group) : 'none'),
     userList,
     button('.ready', 'Ready'),
+    button('.end-turn', 'End Turn'),
   ]));
 }
 
-function act({playerName$, groupId$, toggleReady$, player$}) {
+function act({playerName$, groupId$, toggleReady$, endTurn$, player$}) {
   const state$ = most.combine(toArray, groupId$, playerName$);
 
   return {
@@ -67,6 +69,12 @@ function act({playerName$, groupId$, toggleReady$, player$}) {
           url: `/api/group/${id}/player/${name}/update`,
           send: {ready: !ready},
           category: 'update-player',
+        })),
+      endTurn$.sample(nthArg(0), state$)
+        .map(([{id}, name]) => ({
+          method: 'post',
+          url: `/api/group/${id}/player/${name}/endTurn`,
+          category: 'end-turn',
         }))
     ),
     player: most.never(),
