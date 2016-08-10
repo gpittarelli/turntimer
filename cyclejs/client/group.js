@@ -5,12 +5,15 @@ import {nthArg} from 'ramda';
 import mavi from './mavi';
 import {toArray} from './helpers';
 
+const buttonSideLen = 1.0;
 const styles = StyleSheet.create({
   back: {
     textIndent: '-9999px',
     whiteSpace: 'nowrap',
     userSelect: 'none',
-    position: 'relative',
+    position: 'absolute',
+    top: '1vw',
+    left: '1vw',
     width: 0,
     height: 0,
     padding: 0,
@@ -24,11 +27,10 @@ const styles = StyleSheet.create({
       borderStyle: 'solid',
       borderRadius: '1px',
       transform: 'rotateZ(45deg)',
-      width: '0.4em',
-      height: '0.4em',
+      width: `${buttonSideLen}em`,
+      height: `${buttonSideLen}em`,
       position: 'relative',
-      top: (-1 + (1 - 0.4)/2) + 'em',
-      left: '0.4em',
+      top: (-1 + (1 - buttonSideLen)/2) + 'em',
       cursor: 'pointer',
     },
   },
