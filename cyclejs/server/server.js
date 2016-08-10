@@ -109,7 +109,7 @@ groupRoutes.get('/player/:name', requireGroup, wrap( async({params: {id, name}},
 }));
 
 groupRoutes.patch('/player/:name/update', requireGroup, wrap(async({...req, params: {id, name}, body}, res) => {
-  groups.get(id).update(name, u => merge(u, body))
+  groups.get(id).update(name, u => merge(u, body));
   res.sendStatus(204);
 }));
 
