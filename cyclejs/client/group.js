@@ -4,7 +4,8 @@ import {nthArg} from 'ramda';
 import mavi from './mavi';
 import {toArray} from './helpers';
 
-const CHECK = '\u2713';
+const CHECK = '\u2713',
+  ARROW = '\u21E8';
 
 const intent = () => ({});
 
@@ -29,8 +30,12 @@ function view({group$, playerName$, joinState$}) {
     () => []
   ).startWith([h1('Loading')]);
 
-  const userList$ = group$.map(({users}) => ul(users.map(
-    ({name, ready}) => li([name, ready ? CHECK : ''])
+  const userList$ = group$.map(({users, activeTurn}) => ul(users.map(
+    ({name, ready}, idx) => li([
+      idx === activeTurn ? ARROW : '',
+      name,
+      ready ? CHECK : '',
+    ])
   )));
 
   return most.combineArray(Array.of, [
