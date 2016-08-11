@@ -35,7 +35,6 @@ function view({joinButtonEnabled$}) {
     label('Name:'), input('.name', {attrs: {type: 'text'}}),
     label('Group:'), input('.group-id', {attrs: {type: 'number'}}),
     button('.join-group', {attrs: {disabled: enabled}}, 'Join Group'),
-    a({attrs: {href: '/group/123'}}, 'go'),
   ]));
 }
 
