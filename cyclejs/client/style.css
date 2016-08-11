@@ -57,7 +57,7 @@ table {
 }
 
 /* End Style Resets */
-html, body, #app-container, #app-container > div {
+html, body, #app-container, #app-container > * {
   position: absolute;
   top: 0;
   left: 0;
