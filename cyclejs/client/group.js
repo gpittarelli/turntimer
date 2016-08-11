@@ -108,7 +108,7 @@ function view({group$, playerName$, joinState$}) {
       ])
     )));
 
-  const ourTurn$ = most.combine(Array.of, playerName$, group$).map(
+  const ourTurn$ = most.combine(Array.of, group$, playerName$).map(
     ([{activeTurn, users}, ourName]) =>
       users && (activeTurn === (users.findIndex(u => u.name === ourName)))
   );
