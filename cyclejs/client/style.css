@@ -64,3 +64,10 @@ html, body, #app-container, #app-container > div {
   right: 0;
   bottom: 0;
 }
+
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
