@@ -1,7 +1,7 @@
 import most from 'most';
 import {div, h1, ul, li, button, span} from '@cycle/dom';
 import {StyleSheet, css} from 'aphrodite/no-important';
-import {nthArg} from 'ramda';
+import {nthArg, prop, subtract} from 'ramda';
 import mavi from './mavi';
 import {toArray} from './helpers';
 
@@ -33,6 +33,7 @@ const styles = StyleSheet.create({
     fontSize: '25vw',
     display: 'block',
     textAlign: 'center',
+    fontFamily: 'Segment7Standard,sans-serif',
   },
   userList: {
     textAlign: 'center',
@@ -59,11 +60,17 @@ const CHECK = '\u2713',
 
 const intent = () => ({});
 
-function model({player: player$, id, HTTP, DOM}) {
+function model({player: player$, id, HTTP, DOM, frames$}) {
   const group$ = HTTP.select('update-group').switch().map(({body}) => body),
-    playerName$ = player$.map(({name}) => name);
+    playerName$ = player$.map(({name}) => name),
+    frameDelta$ = frames$.scan(({delta: prevDelta, absTime: prevAbsTime}, frameAbsTime) => ({
+      delta: !prevAbsTime ? 0 : (frameAbsTime - prevAbsTime),
+      absTime: frameAbsTime,
+    }), {delta: 0}).map(prop('delta'));
+
 
   return {
+    frameDelta$,
     groupId$: most.of({id}),
     group$,
     joinState$: HTTP.select('join-group').switch().map(({body}) => body),
@@ -73,6 +80,9 @@ function model({player: player$, id, HTTP, DOM}) {
     toggleReady$: DOM.select('.ready').events('click'),
     endTurn$: DOM.select('.end-turn').events('click'),
     goBack$: DOM.select('.go-back').events('click'),
+    timeLeft$: group$.map(({timeLeft}) => (
+      frameDelta$.map(s=>s/1000).scan(subtract, timeLeft)
+    )).switch(),
   };
 }
 
@@ -82,7 +92,7 @@ const backButton = button(
   'Back home'
 );
 
-function view({group$, playerName$, joinState$}) {
+function view({timeLeft$, group$, playerName$, joinState$}) {
   const joinStateUI$ = joinState$.map(
     () => []
   ).startWith([h1('Loading')]);
@@ -108,8 +118,8 @@ function view({group$, playerName$, joinState$}) {
   );
 
   return most.combineArray(Array.of, [
-    group$, userList$, joinStateUI$, ourTurn$,
-  ]).map(([{timeLeft}, userList, joinStateUI, ourTurn]) => div({
+    userList$, joinStateUI$, ourTurn$, timeLeft$,
+  ]).map(([userList, joinStateUI, ourTurn, timeLeft]) => div({
     class: {
       [css(styles.ourTurn)]: ourTurn,
       [css(styles.otherTurn)]: !ourTurn,
@@ -117,7 +127,11 @@ function view({group$, playerName$, joinState$}) {
   }, [
     backButton,
     ...joinStateUI,
-    div('.turn-time', {class: {[css(styles.timer)]: true}}, timeLeft),
+    div(
+      '.turn-time',
+      {class: {[css(styles.timer)]: true}},
+      ((timeLeft < 10) ? '0' : '') + timeLeft.toFixed(3)
+    ),
     userList,
     button('.end-turn', {class: {[css(styles.endTurn)]: true}}, 'End Turn'),
   ]));
