@@ -10,6 +10,9 @@ import {fromPairs} from 'ramda';
 import makeStateDriver from './stateDriver';
 import Home from './home';
 import Group from './group';
+import createAnimationFrameStream from './animationFrameStream';
+
+const frames$ = createAnimationFrameStream();
 
 const drivers = {
   DOM: makeDOMDriver('#app-container'),
@@ -19,6 +22,8 @@ const drivers = {
 };
 
 function view({...sources, router}) {
+  sources.frames$ = frames$;
+
   const page = router.define({
     '/group/:id': id => otherSources => Group({...otherSources, id}),
     '*': Home,
