@@ -71,3 +71,10 @@ html {
 *, *:before, *:after {
   box-sizing: inherit;
 }
+
+@font-face {
+  font-family: 'Segment7Standard';
+  src: url('./resources/Segment7Standard.otf') format('opentype');
+  font-weight: normal;
+  font-style: italic;
+}

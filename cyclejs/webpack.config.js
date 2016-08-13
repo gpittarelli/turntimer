@@ -15,6 +15,8 @@ module.exports = {
     loaders: [
       { test: /\.css$/, loader: 'style!css' },
       { test: /\.js$/, exclude: /node_modules/, loader: 'babel' },
+      { test: /\.(png|jpg|jpeg|gif|woff|woff2|ttf|eot|otf|webm|mp4|ogg|wav)$/,
+        loader: 'file?name=[path][name].[ext]' },
     ],
   },
   plugins: [
