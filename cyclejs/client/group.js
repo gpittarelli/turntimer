@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     fontSize: '25vw',
     display: 'block',
     textAlign: 'center',
-    fontFamily: 'Segment7Standard,sans-serif',
+    fontFamily: 'DSEG7Classic,sans-serif',
   },
   userList: {
     textAlign: 'center',
@@ -56,7 +56,8 @@ const styles = StyleSheet.create({
 });
 
 const CHECK = '\u2713',
-  ARROW = '\u21E8';
+  ARROW = '\u21E8',
+  NBSP = '\u00A0';
 
 const intent = () => ({});
 
@@ -130,7 +131,8 @@ function view({timeLeft$, group$, playerName$, joinState$}) {
     div(
       '.turn-time',
       {class: {[css(styles.timer)]: true}},
-      ((timeLeft < 10) ? '0' : '') + timeLeft.toFixed(3)
+      ((timeLeft < 10) ? '0' : '') +
+        timeLeft.toFixed(3).replace('.', `${NBSP}:${NBSP}`)
     ),
     userList,
     button('.end-turn', {class: {[css(styles.endTurn)]: true}}, 'End Turn'),

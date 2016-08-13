@@ -12,5 +12,5 @@ This project: © George Pittarelli 2016
 
 ## Other Resources
 
-Segment7 Font: Released by Cedric Knight under the SIL Open Font License (OFL)
-Retrieved from: https://fontlibrary.org/en/font/segment7
+DSEG7 Font: Released under a permissive license
+Retrieved from: http://www.keshikan.net/fonts-e.html

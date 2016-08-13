@@ -73,8 +73,8 @@ html {
 }
 
 @font-face {
-  font-family: 'Segment7Standard';
-  src: url('./resources/Segment7Standard.otf') format('opentype');
+  font-family: 'DSEG7Classic';
+  src: url('./resources/DSEG7Classic-Regular.woff') format('woff');
   font-weight: normal;
-  font-style: italic;
+  font-style: regular;
 }
