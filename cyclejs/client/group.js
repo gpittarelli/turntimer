@@ -4,6 +4,7 @@ import {StyleSheet, css} from 'aphrodite/no-important';
 import {nthArg, prop, subtract} from 'ramda';
 import mavi from './mavi';
 import {toArray} from './helpers';
+import formatSeconds from '../lib/formatSeconds';
 
 const buttonSideLen = 2.0;
 const styles = StyleSheet.create({
@@ -131,8 +132,7 @@ function view({timeLeft$, group$, playerName$, joinState$}) {
     div(
       '.turn-time',
       {class: {[css(styles.timer)]: true}},
-      ((timeLeft < 10) ? '0' : '') +
-        timeLeft.toFixed(3).replace('.', `${NBSP}:${NBSP}`)
+      formatSeconds(timeLeft)
     ),
     userList,
     button('.end-turn', {class: {[css(styles.endTurn)]: true}}, 'End Turn'),
