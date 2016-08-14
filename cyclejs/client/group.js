@@ -29,8 +29,8 @@ const styles = StyleSheet.create({
     cursor: 'pointer',
   },
   timer: {
-    margin: '10%',
-    fontSize: '25vw',
+    margin: '5% 0',
+    fontSize: '14vmin',
     display: 'block',
     textAlign: 'center',
     fontFamily: 'DSEG7Classic,sans-serif',
