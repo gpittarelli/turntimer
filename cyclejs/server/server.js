@@ -18,8 +18,11 @@ const tick$ = most.periodic(1000, '').map(seconds);
 const groups = new Map();
 function createGroup(id, turnTime=60) {
   const userEvents = new EventEmitter(),
-    startTime = seconds(),
     activeTurn$ = hold(most.fromEvent('endTurn', userEvents).scan(inc, 0)),
+    timeLeft$ = hold(activeTurn$.map(() => {
+      const turnStartTime = seconds();
+      return tick$.map(x => (60 - (x - turnStartTime)));
+    }).switch()),
     users$ = hold(most.merge(
       most.fromEvent('join', userEvents)
         .map(newUser => users => {
@@ -46,14 +49,14 @@ function createGroup(id, turnTime=60) {
     join: u => userEvents.emit('join', u),
     update: (user, update) => userEvents.emit('update', user, update),
     endTurn: u => userEvents.emit('endTurn', u),
-    data: most.combine(Array.of, tick$, users$, activeTurn$)
-      .map(([now, users, activeTurn]) => {
+    data: most.combine(Array.of, users$, activeTurn$, timeLeft$)
+      .map(([users, activeTurn, timeLeft]) => {
         return {
           id,
           activeTurn: activeTurn % users.length,
           state: users.length > 0 && users.every(prop('ready')) ? 'ready' : 'waiting',
           turnTime,
-          timeLeft: 60 - ((now - startTime) % 60),
+          timeLeft,
           users,
         };
       }),
