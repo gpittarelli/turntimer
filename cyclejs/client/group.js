@@ -56,10 +56,6 @@ const styles = StyleSheet.create({
   },
 });
 
-const CHECK = '\u2713',
-  ARROW = '\u21E8',
-  NBSP = '\u00A0';
-
 const intent = () => ({});
 
 function model({player: player$, id, HTTP, DOM, frames$}) {
