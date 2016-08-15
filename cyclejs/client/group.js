@@ -45,9 +45,13 @@ const styles = StyleSheet.create({
     display: 'block',
     height: '5%',
   },
-  active: {
+  activeName: {
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  ourName: {
     color: 'red',
   },
+  playerReady: {},
   ourTurn: {
     backgroundColor: 'green',
   },
@@ -99,15 +103,13 @@ function view({timeLeft$, group$, playerName$, joinState$}) {
     .map(([{users, activeTurn}, ourName]) => ul({
       class: {[css(styles.userList)]: true},
     }, users.map(
-      ({name, ready}, idx) => li([
-        idx === activeTurn ? ARROW : '',
-        span({
-          class: {
-            [css(styles.active)]: name === ourName,
-          },
-        }, name),
-        ready ? CHECK : '',
-      ])
+      ({name, ready}, idx) => li({
+        class: {
+          [css(styles.activeName)]: idx === activeTurn,
+          [css(styles.ourName)]: name === ourName,
+          [css(styles.playerReady)]: ready,
+        },
+      }, name)
     )));
 
   const ourTurn$ = most.combine(Array.of, group$, playerName$).map(
