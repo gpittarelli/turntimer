@@ -1,5 +1,5 @@
 import most from 'most';
-import {div, h1, ul, li, button, span} from '@cycle/dom';
+import {div, h1, ul, li, button} from '@cycle/dom';
 import {StyleSheet, css} from 'aphrodite/no-important';
 import {nthArg, prop, subtract} from 'ramda';
 import mavi from './mavi';
