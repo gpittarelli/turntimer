@@ -5,6 +5,7 @@ import {nthArg, prop, subtract} from 'ramda';
 import mavi from './mavi';
 import {toArray} from './helpers';
 import formatSeconds from '../lib/formatSeconds';
+import centerAround from '../lib/centerAround';
 
 const buttonSideLen = 2.0;
 const styles = StyleSheet.create({
@@ -102,7 +103,7 @@ function view({timeLeft$, group$, playerName$, joinState$}) {
   const userList$ = group$.combine(Array.of, playerName$)
     .map(([{users, activeTurn}, ourName]) => ul({
       class: {[css(styles.userList)]: true},
-    }, users.map(
+    }, centerAround(activeTurn, users.map(
       ({name, ready}, idx) => li({
         class: {
           [css(styles.activeName)]: idx === activeTurn,
@@ -110,7 +111,8 @@ function view({timeLeft$, group$, playerName$, joinState$}) {
           [css(styles.playerReady)]: ready,
         },
       }, name)
-    )));
+    ))));
+
 
   const ourTurn$ = most.combine(Array.of, group$, playerName$).map(
     ([{activeTurn, users}, ourName]) =>
