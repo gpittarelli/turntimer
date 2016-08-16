@@ -7,6 +7,6 @@ export default function centerAround(x, arr) {
   // currently at index x is in the center (if n is even, x will end
   // up at the at the end of the first half of the array)
   const n = arr.length,
-    m = Math.floor(n/2);
+    m = Math.ceil(n/2) - 1;
   return rotate(x - m, arr);
 }

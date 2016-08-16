@@ -45,10 +45,10 @@ describe('centerAround()', () => {
     'should do nothing when centering around the middle',
     [gen.array(gen.int)],
     arr => {
-      assert(equals(centerAround(Math.floor(arr.length/2), arr), arr));
+      assert(equals(centerAround(Math.ceil(arr.length/2) - 1, arr), arr));
     });
 
-  it('test cases', () => {
+  it('odd length test cases', () => {
     const base = [1, 2, 3, 4, 5],
       cases = [
         [0, [4, 5, 1, 2, 3]],
@@ -56,6 +56,20 @@ describe('centerAround()', () => {
         [2, [1, 2, 3, 4, 5]],
         [3, [2, 3, 4, 5, 1]],
         [4, [3, 4, 5, 1, 2]],
+      ];
+
+    cases.forEach(([idx, expected]) => {
+      assert.deepEqual(centerAround(idx, base), expected);
+    });
+  });
+
+  it('even length test cases', () => {
+    const base = [1, 2, 3, 4],
+      cases = [
+        [0, [4, 1, 2, 3]],
+        [1, base],
+        [2, [2, 3, 4, 1]],
+        [3, [3, 4, 1, 2]],
       ];
 
     cases.forEach(([idx, expected]) => {
