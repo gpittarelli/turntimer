@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
 function intent({DOM}) {
   const name$ = DOM.select('.name').events('input').map(eventValue),
     groupId$ = DOM.select('.group-id').events('input').map(eventValue),
-    turnTime$ = DOM.select('.turn-time').events('input').map(eventValue),
+    turnTime$ = DOM.select('.turn-time').events('input').map(eventValue).startWith(60),
     joinGroup$ = DOM.select('.join-group').events('click'),
     createGroup$ = DOM.select('.create-group').events('click');
 
@@ -122,7 +122,7 @@ function view({joinButtonEnabled$}) {
 
 function act({name$, player$, groupCreated$, createGroup$}) {
   return {
-    HTTP: createGroup$.map(([,groupId, turnTime]) => ({
+    HTTP: createGroup$.map(([, groupId, turnTime]) => ({
       method: 'POST',
       url: `/api/group/${groupId}`,
       query: {turnTime},
