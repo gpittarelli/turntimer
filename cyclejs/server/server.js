@@ -11,18 +11,19 @@ import toPromise from '../lib/toPromise';
 import createDebug from 'debug';
 const debug = createDebug('server');
 
-const seconds = () => Math.round(Date.now() / 1000);
-
+const seconds = () => Date.now() / 1000;
 const tick$ = most.periodic(1000, '').map(seconds);
 
 const groups = new Map();
 function createGroup(id, turnTime=60) {
   const userEvents = new EventEmitter(),
     activeTurn$ = hold(most.fromEvent('endTurn', userEvents).scan(inc, 0)),
-    timeLeft$ = hold(activeTurn$.map(() => {
-      const turnStartTime = seconds();
-      return tick$.map(x => (turnTime - (x - turnStartTime)));
-    }).switch()),
+    timeLeft$ = hold(
+      activeTurn$.map(() => {
+        const turnStartTime = seconds();
+        return tick$.map(x => Math.round(turnTime - (x - turnStartTime)));
+      }).switch()
+    ),
     users$ = hold(most.merge(
       most.fromEvent('join', userEvents)
         .map(newUser => users => {
