@@ -45,23 +45,33 @@ const styles = StyleSheet.create({
 function intent({DOM}) {
   const name$ = DOM.select('.name').events('input').map(eventValue),
     groupId$ = DOM.select('.group-id').events('input').map(eventValue),
-    joinGroup$ = DOM.select('.join-group').events('click');
+    turnTime$ = DOM.select('.turn-time').events('input').map(eventValue),
+    joinGroup$ = DOM.select('.join-group').events('click'),
+    createGroup$ = DOM.select('.create-group').events('click');
 
   return {
     name$,
     groupId$,
     joinGroup$,
+    turnTime$,
+    createGroup$,
   };
 }
 
-function model({HTTP, player: player$, name$, groupId$, joinGroup$}) {
+function model({
+  HTTP, player: player$, name$, turnTime$,
+  groupId$, joinGroup$, createGroup$,
+}) {
+  const buttonClick$ = most.merge(joinGroup$, createGroup$);
+
   return {
-    joinButtonEnabled$: most.combine(toArray,
+    joinButtonEnabled$: most.combine(
+      toArray,
       name$.startWith(false),
       groupId$.startWith(false),
-      joinGroup$.map(() => true).startWith(false)
+      buttonClick$.map(() => true).startWith(false)
     ).map(([name, groupId, click]) => !(name && groupId) || click),
-    joinButtonClicked$: most.combine(toArray, name$, groupId$, joinGroup$),
+    createGroup$: most.combine(toArray, name$, groupId$, turnTime$, buttonClick$),
     groupCreated$: HTTP.select('join-group').switch().map(prop('body')),
     name$,
     player$,
@@ -93,14 +103,29 @@ function view({joinButtonEnabled$}) {
       attrs: {disabled: enabled},
       class: {[css(styles.joinButton)]: true},
     }, 'Join Group'),
+    div({class: {[css(styles.formRow)]: true}}, [
+      label({class:{[css(styles.label)]: true}}, 'Turn Time:'),
+      input('.turn-time', {
+        attrs: {required: true, type: 'number', min: 0, value: 60},
+        class: {
+          [css(styles.input)]: true,
+          [css(styles.numberInput)]: true,
+        },
+      }),
+    ]),
+    button('.create-group', {
+      attrs: {disabled: enabled},
+      class: {[css(styles.joinButton)]: true},
+    }, 'Create Group'),
   ]));
 }
 
-function act({name$, player$, groupCreated$, joinButtonClicked$}) {
+function act({name$, player$, groupCreated$, createGroup$}) {
   return {
-    HTTP: joinButtonClicked$.map(([,groupId]) => ({
+    HTTP: createGroup$.map(([,groupId, turnTime]) => ({
       method: 'POST',
       url: `/api/group/${groupId}`,
+      query: {turnTime},
       category: 'join-group',
     })),
     router: most.combine(nthArg(0), groupCreated$, player$)
