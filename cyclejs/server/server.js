@@ -44,6 +44,7 @@ function createGroup(id, turnTime=60) {
 
   users$.drain().then(()=>1, err => console.error(err));
   activeTurn$.drain().then(()=>1, err => console.error(err));
+  timeLeft$.drain().then(()=>1, err => console.error(err));
 
   return {
     join: u => userEvents.emit('join', u),
