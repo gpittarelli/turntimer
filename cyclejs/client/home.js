@@ -3,11 +3,12 @@ import {form, div, label, input, button} from '@cycle/dom';
 import {prop, assoc, nthArg} from 'ramda';
 import mavi from './mavi';
 import {toArray, eventValue} from './helpers';
+import * as colors from './colors';
 import {StyleSheet, css} from 'aphrodite/no-important';
 
 const styles = StyleSheet.create({
   page: {
-    backgroundColor: 'gray',
+    backgroundColor: colors.bgGray,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',

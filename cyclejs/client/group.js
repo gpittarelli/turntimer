@@ -4,6 +4,7 @@ import {StyleSheet, css} from 'aphrodite/no-important';
 import {nthArg, prop, subtract} from 'ramda';
 import mavi from './mavi';
 import {toArray} from './helpers';
+import * as colors from './colors';
 import formatSeconds from '../lib/formatSeconds';
 import centerAround from '../lib/centerAround';
 
@@ -39,15 +40,26 @@ const styles = StyleSheet.create({
   },
   userList: {
     textAlign: 'center',
+    border: '1px black solid',
+    borderLeftWidth: 0,
+    borderRightWidth: 0,
+    fontFamily: 'Helvetica, Arial, sans-serif',
+    fontSize: '2.5vmin',
+    backgroundColor: 'rgba(0, 0, 0, 0.14)',
   },
   endTurn: {
+    fontSize: '2.5vmin',
     margin: '2em auto 0',
     width: '75%',
     display: 'block',
     height: '5%',
   },
+  userName: {
+    padding: '0.2em 0',
+  },
   activeName: {
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    color: 'white',
   },
   ourName: {
     color: 'red',
@@ -57,7 +69,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'green',
   },
   otherTurn: {
-    backgroundColor: 'gray',
+    backgroundColor: colors.bgGray,
   },
 });
 
@@ -106,6 +118,7 @@ function view({timeLeft$, group$, playerName$, joinState$}) {
     }, centerAround(activeTurn, users.map(
       ({name, ready}, idx) => li({
         class: {
+          [css(styles.userName)]: true,
           [css(styles.activeName)]: idx === activeTurn,
           [css(styles.ourName)]: name === ourName,
           [css(styles.playerReady)]: ready,
