@@ -21,7 +21,7 @@ function createGroup(id, turnTime=60) {
     activeTurn$ = hold(most.fromEvent('endTurn', userEvents).scan(inc, 0)),
     timeLeft$ = hold(activeTurn$.map(() => {
       const turnStartTime = seconds();
-      return tick$.map(x => (60 - (x - turnStartTime)));
+      return tick$.map(x => (turnTime - (x - turnStartTime)));
     }).switch()),
     users$ = hold(most.merge(
       most.fromEvent('join', userEvents)
@@ -86,9 +86,9 @@ function requireGroup({params: {id}}, res, next) {
 
 const wrap = routeFn => (req, res, next) => routeFn(req, res, next).catch(next);
 
-groupRoutes.post('/', wrap(async ({params: {id}}, res) => {
+groupRoutes.post('/', wrap(async ({params: {id}, query: {turnTime}}, res) => {
   if (!groups.has(id)) {
-    groups.set(id, createGroup(id));
+    groups.set(id, createGroup(id, turnTime));
   }
   res.send(await getGroup(id));
 }));
