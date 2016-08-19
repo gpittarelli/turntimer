@@ -154,7 +154,7 @@ function view({timeLeft$, group$, playerName$, joinState$}) {
     userList,
     button('.end-turn', {
       class: {[css(styles.endTurn)]: true},
-      attrs: ourTurn ? {disabled: true} : {},
+      attrs: ourTurn ? {} : {disabled: true},
     }, 'End Turn'),
   ]));
 }
