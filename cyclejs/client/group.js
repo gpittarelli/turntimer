@@ -152,7 +152,10 @@ function view({timeLeft$, group$, playerName$, joinState$}) {
       formatSeconds(timeLeft)
     ),
     userList,
-    button('.end-turn', {class: {[css(styles.endTurn)]: true}}, 'End Turn'),
+    button('.end-turn', {
+      class: {[css(styles.endTurn)]: true},
+      attrs: ourTurn ? {disabled: true} : {},
+    }, 'End Turn'),
   ]));
 }
 
