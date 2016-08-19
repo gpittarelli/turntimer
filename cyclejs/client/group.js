@@ -44,7 +44,6 @@ const styles = StyleSheet.create({
     borderLeftWidth: 0,
     borderRightWidth: 0,
     fontFamily: 'Helvetica, Arial, sans-serif',
-    fontSize: '2.5vmin',
     backgroundColor: 'rgba(0, 0, 0, 0.14)',
   },
   endTurn: {
@@ -56,6 +55,7 @@ const styles = StyleSheet.create({
   },
   userName: {
     padding: '0.2em 0',
+    fontSize: '6vw',
   },
   activeName: {
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
