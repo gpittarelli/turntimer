@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   },
   userName: {
     padding: '0.2em 0',
-    fontSize: '6vw',
+    fontSize: '6vmin',
   },
   activeName: {
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
