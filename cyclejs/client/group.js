@@ -47,11 +47,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.14)',
   },
   endTurn: {
-    fontSize: '2.5vmin',
-    margin: '2em auto 0',
+    fontSize: '8vmin',
+    margin: '1.5em auto 0',
     width: '75%',
     display: 'block',
-    height: '5%',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    border: 0,
+    borderRadius: '7px',
+    padding: '30px 0',
+    color: 'rgba(255, 255, 255, 0.6)',
   },
   userName: {
     padding: '0.2em 0',
