@@ -4,7 +4,6 @@ import assert from 'assert';
 import {equals} from 'ramda';
 
 import tileMin from '../../lib/tileMin';
-const intAbove = min => gen.intWithin(min, Number.MAX_SAFE_INTEGER);
 
 describe('takeCenter()', () => {
   check.it(
