@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   ourName: {
-    color: 'red',
+    textShadow: '0 0 0.23em hsl(241, 100%, 30%)',
   },
   playerReady: {},
   ourTurn: {
