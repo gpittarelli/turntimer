@@ -51,6 +51,7 @@ const styles = StyleSheet.create({
     fontSize: '6vmin',
     minHeight: '3.5em',
     maxHeight: '5.5em',
+    overflow: 'hidden',
   },
   endTurn: {
     fontSize: '8vmin',
