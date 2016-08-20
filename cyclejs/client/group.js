@@ -1,12 +1,15 @@
 import most from 'most';
 import {div, h1, ul, li, button} from '@cycle/dom';
 import {StyleSheet, css} from 'aphrodite/no-important';
-import {nthArg, prop, subtract} from 'ramda';
+import {reverse, nthArg, prop, subtract, pipe, addIndex, map} from 'ramda';
 import mavi from './mavi';
 import {toArray} from './helpers';
 import * as colors from './colors';
 import formatSeconds from '../lib/formatSeconds';
 import centerAround from '../lib/centerAround';
+import takeCenter from '../lib/takeCenter';
+
+const mapIndexed = addIndex(map);
 
 const buttonSideLen = 2.0;
 const styles = StyleSheet.create({
@@ -117,6 +120,23 @@ const backButton = button(
   'Back home'
 );
 
+const renderUserNames = (users, activeTurnIdx, ourName) => pipe(
+  mapIndexed((u, idx) => [u, idx]),
+  centerAround(activeTurnIdx),
+  takeCenter(5),
+  reverse,
+  map(([{name, ready}, idx]) => (
+    li({
+      class: {
+        [css(styles.userName)]: true,
+        [css(styles.activeName)]: idx === activeTurnIdx,
+        [css(styles.ourName)]: name === ourName,
+        [css(styles.playerReady)]: ready,
+      },
+    }, name)
+  )),
+)(users);
+
 function view({timeLeft$, group$, playerName$, joinState$}) {
   const joinStateUI$ = joinState$.map(
     () => []
@@ -125,16 +145,7 @@ function view({timeLeft$, group$, playerName$, joinState$}) {
   const userList$ = group$.combine(Array.of, playerName$)
     .map(([{users, activeTurn}, ourName]) => ul({
       class: {[css(styles.userList)]: true},
-    }, centerAround(activeTurn, users.map(
-      ({name, ready}, idx) => li({
-        class: {
-          [css(styles.userName)]: true,
-          [css(styles.activeName)]: idx === activeTurn,
-          [css(styles.ourName)]: name === ourName,
-          [css(styles.playerReady)]: ready,
-        },
-      }, name)
-    ))));
+    }, renderUserNames(users, activeTurn, ourName)));
 
 
   const ourTurn$ = most.combine(Array.of, group$, playerName$).map(
