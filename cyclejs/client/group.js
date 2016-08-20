@@ -8,6 +8,7 @@ import * as colors from './colors';
 import formatSeconds from '../lib/formatSeconds';
 import centerAround from '../lib/centerAround';
 import takeCenter from '../lib/takeCenter';
+import tileMin from '../lib/tileMin';
 
 const mapIndexed = addIndex(map);
 
@@ -122,15 +123,15 @@ const backButton = button(
 );
 
 const renderUserNames = (users, activeTurnIdx, ourName) => pipe(
-  mapIndexed((u, idx) => [u, idx]),
   centerAround(activeTurnIdx),
+  tileMin(5),
   takeCenter(5),
   reverse,
-  map(([{name, ready}, idx]) => (
+  mapIndexed(({name, ready}, idx) => (
     li({
       class: {
         [css(styles.userName)]: true,
-        [css(styles.activeName)]: idx === activeTurnIdx,
+        [css(styles.activeName)]: idx === 2,
         [css(styles.ourName)]: name === ourName,
         [css(styles.playerReady)]: ready,
       },
