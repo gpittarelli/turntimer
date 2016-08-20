@@ -46,7 +46,8 @@ const styles = StyleSheet.create({
 function intent({DOM}) {
   const name$ = DOM.select('.name').events('input').map(eventValue),
     groupId$ = DOM.select('.group-id').events('input').map(eventValue),
-    turnTime$ = DOM.select('.turn-time').events('input').map(eventValue).startWith(60),
+    turnTime$ =
+      DOM.select('.turn-time').events('input').map(eventValue).startWith(60),
     joinGroup$ = DOM.select('.join-group').events('click'),
     createGroup$ = DOM.select('.create-group').events('click');
 
@@ -72,7 +73,8 @@ function model({
       groupId$.startWith(false),
       buttonClick$.map(() => true).startWith(false)
     ).map(([name, groupId, click]) => !(name && groupId) || click),
-    createGroup$: most.combine(toArray, name$, groupId$, turnTime$, buttonClick$),
+    createGroup$:
+      most.combine(toArray, name$, groupId$, turnTime$, buttonClick$),
     groupCreated$: HTTP.select('join-group').switch().map(prop('body')),
     name$,
     player$,

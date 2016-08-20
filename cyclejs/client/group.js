@@ -96,11 +96,11 @@ const intent = () => ({});
 function model({player: player$, id, HTTP, DOM, frames$}) {
   const group$ = HTTP.select('update-group').switch().map(({body}) => body),
     playerName$ = player$.map(({name}) => name),
-    frameDelta$ = frames$.scan(({delta: prevDelta, absTime: prevAbsTime}, frameAbsTime) => ({
-      delta: !prevAbsTime ? 0 : (frameAbsTime - prevAbsTime),
-      absTime: frameAbsTime,
-    }), {delta: 0}).map(prop('delta'));
-
+    frameDelta$ = frames$.scan(
+      ({delta: prevDelta, absTime: prevAbsTime}, frameAbsTime) => ({
+        delta: !prevAbsTime ? 0 : (frameAbsTime - prevAbsTime),
+        absTime: frameAbsTime,
+      }), {delta: 0}).map(prop('delta'));
 
   return {
     frameDelta$,
@@ -182,16 +182,19 @@ function view({timeLeft$, group$, playerName$, joinState$}) {
   ]));
 }
 
-function act({playerName$, groupId$, toggleReady$, endTurn$, player$, goBack$}) {
+function act({
+  playerName$, groupId$, toggleReady$, endTurn$, player$, goBack$,
+}) {
   const state$ = most.combine(toArray, groupId$, playerName$);
 
   return {
     HTTP: most.merge(
-      most.combine(nthArg(0), groupId$, most.periodic(1000).startWith(0)).map(({id}) => ({
-        method: 'get',
-        url: `/api/group/${id}`,
-        category: 'update-group',
-      })),
+      most.combine(nthArg(0), groupId$, most.periodic(1000).startWith(0))
+        .map(({id}) => ({
+          method: 'get',
+          url: `/api/group/${id}`,
+          category: 'update-group',
+        })),
       state$.map(([{id}, name]) => ({
         method: 'post',
         url: `/api/group/${id}/player/${name}`,

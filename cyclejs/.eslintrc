@@ -6,6 +6,7 @@
     "sourceType": "module"
   },
   "rules": {
+    "max-len": ["error", {code: 80, ignoreUrls: true}],
     "comma-dangle": ["error", "always-multiline"],
     "no-shadow": "error",
     "no-console": ["error", {allow: ["warn", "error"]}],

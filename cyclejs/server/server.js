@@ -53,10 +53,11 @@ function createGroup(id, turnTime=60) {
     endTurn: u => userEvents.emit('endTurn', u),
     data: most.combine(Array.of, users$, activeTurn$, timeLeft$)
       .map(([users, activeTurn, timeLeft]) => {
+        const allReady = users.length > 0 && users.every(prop('ready'));
         return {
           id,
           activeTurn: activeTurn % users.length,
-          state: users.length > 0 && users.every(prop('ready')) ? 'ready' : 'waiting',
+          state: allReady ? 'ready' : 'waiting',
           turnTime,
           timeLeft,
           users,
@@ -104,7 +105,8 @@ groupRoutes.post('/player/:name', requireGroup, ({params: {id, name}}, res) => {
   res.send(newUser);
 });
 
-groupRoutes.get('/player/:name', requireGroup, wrap( async({params: {id, name}}, res) => {
+groupRoutes.get('/player/:name', requireGroup, wrap(findUser));
+async function findUser({params: {id, name}}, res) {
   const group = await getGroup(id),
     user = group.users.filter(u => u.name === name)[0];
   if (user) {
@@ -112,17 +114,19 @@ groupRoutes.get('/player/:name', requireGroup, wrap( async({params: {id, name}},
   } else {
     res.sendStatus(404);
   }
-}));
+}
 
-groupRoutes.patch('/player/:name/update', requireGroup, wrap(async({...req, params: {id, name}, body}, res) => {
+groupRoutes.patch('/player/:name/update', requireGroup, updateUser);
+function updateUser({...req, params: {id, name}, body}, res) {
   groups.get(id).update(name, u => merge(u, body));
   res.sendStatus(204);
-}));
+}
 
-groupRoutes.post('/player/:name/endTurn', requireGroup, wrap(async({...req, params: {id, name}, body}, res) => {
+groupRoutes.post('/player/:name/endTurn', requireGroup, endTurn);
+function endTurn({...req, params: {id, name}, body}, res) {
   groups.get(id).endTurn(name);
   res.sendStatus(204);
-}));
+}
 
 const apiRoutes = Router({mergeParams: true});
 apiRoutes.get('/', (req, res) => res.send('API'));
