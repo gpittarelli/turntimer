@@ -65,6 +65,9 @@ const styles = StyleSheet.create({
     padding: '30px 0',
     color: 'rgba(255, 255, 255, 0.6)',
   },
+  pastName: {
+    color: 'hsl(0, 0%, 40%)',
+  },
   userName: {
     padding: '0.2em 0',
     position: 'relative',
@@ -132,6 +135,7 @@ const renderUserNames = (users, activeTurnIdx, ourName) => pipe(
       class: {
         [css(styles.userName)]: true,
         [css(styles.activeName)]: idx === 2,
+        [css(styles.pastName)]: idx > 2,
         [css(styles.ourName)]: name === ourName,
         [css(styles.playerReady)]: ready,
       },
