@@ -95,7 +95,7 @@ const intent = () => ({});
 
 function model({player: player$, id, HTTP, DOM, frames$}) {
   const group$ = HTTP.select('update-group').switch().map(({body}) => body),
-    playerName$ = player$.map(({name}) => name),
+    playerName$ = player$,
     frameDelta$ = frames$.scan(
       ({delta: prevDelta, absTime: prevAbsTime}, frameAbsTime) => ({
         delta: !prevAbsTime ? 0 : (frameAbsTime - prevAbsTime),

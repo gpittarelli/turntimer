@@ -61,8 +61,7 @@ function intent({DOM}) {
 }
 
 function model({
-  HTTP, player: player$, name$, turnTime$,
-  groupId$, joinGroup$, createGroup$,
+  HTTP, name$, turnTime$, groupId$, joinGroup$, createGroup$,
 }) {
   const buttonClick$ = most.merge(joinGroup$, createGroup$);
 
@@ -77,7 +76,6 @@ function model({
       most.combine(toArray, name$, groupId$, turnTime$, buttonClick$),
     groupCreated$: HTTP.select('join-group').switch().map(prop('body')),
     name$,
-    player$,
   };
 }
 
@@ -123,7 +121,7 @@ function view({joinButtonEnabled$}) {
   ]));
 }
 
-function act({name$, player$, groupCreated$, createGroup$}) {
+function act({name$, groupCreated$, createGroup$}) {
   return {
     HTTP: createGroup$.map(([, groupId, turnTime]) => ({
       method: 'POST',
@@ -131,10 +129,8 @@ function act({name$, player$, groupCreated$, createGroup$}) {
       query: {turnTime},
       category: 'join-group',
     })),
-    router: most.combine(nthArg(0), groupCreated$, player$)
-      .map(({id}) => `/group/${id}`),
-    player: most.combine(nthArg(0), name$, groupCreated$)
-      .map(name => assoc('name', name)),
+    router: most.combine(Array.of, groupCreated$, name$)
+      .map(([{id}, name]) => `/group/${id}/${name}`),
   };
 }
 

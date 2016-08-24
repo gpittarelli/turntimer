@@ -18,14 +18,17 @@ const drivers = {
   DOM: makeDOMDriver('#app-container'),
   router: makeRouterDriver(createHistory(), {capture: true}),
   HTTP: makeHTTPDriver(),
-  player: makeStateDriver(),
 };
 
 function view({...sources, router}) {
   sources.frames$ = frames$;
 
   const page = router.define({
-    '/group/:id': id => otherSources => Group({...otherSources, id}),
+    '/group/:id/:player': (id, player) => otherSources => Group({
+      ...otherSources,
+      id,
+      player: most.of(player),
+    }),
     '*': Home,
   }).map(({path, value}) =>
            isolate(value)({...sources, router: router.path(path)}))
