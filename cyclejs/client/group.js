@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   },
   playerReady: {},
   ourTurn: {
-    backgroundColor: 'green',
+    backgroundColor: 'hsl(113, 100%, 56%)',
   },
   otherTurn: {
     backgroundColor: colors.bgGray,
