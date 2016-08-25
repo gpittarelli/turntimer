@@ -1,0 +1,38 @@
+{
+  "name": "turntimer-api-node-streams",
+  "version": "0.0.1",
+  "description": "API turntimer server in node.js with streams",
+  "main": "lib/server.js",
+  "scripts": {
+    "start": "cross-env PORT=8081 nodemon lib/server.js --exec babel-node",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "George Pittarelli",
+  "license": "MIT",
+  "dependencies": {
+    "@most/hold": "1.3.1",
+    "babel-cli": "6.14.0",
+    "babel-core": "6.14.0",
+    "babel-eslint": "6.1.2",
+    "babel-loader": "6.2.5",
+    "babel-plugin-ramda": "1.1.5",
+    "babel-plugin-transform-object-rest-spread": "6.8.0",
+    "babel-polyfill": "6.13.0",
+    "babel-preset-es2015": "6.14.0",
+    "babel-preset-es2016": "6.11.3",
+    "babel-preset-stage-3": "6.11.0",
+    "babel-register": "6.14.0",
+    "body-parser": "1.15.2",
+    "cross-env": "2.0.0",
+    "debug": "2.2.0",
+    "eslint": "3.3.1",
+    "events": "1.1.1",
+    "express": "4.14.0",
+    "localenv": "0.2.2",
+    "morgan": "1.7.0",
+    "most": "1.0.1",
+    "nodemon": "1.10.2",
+    "ramda": "0.22.1",
+    "webpack": "1.13.2"
+  }
+}
