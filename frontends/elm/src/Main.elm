@@ -5,9 +5,12 @@ import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (type')
 
 main: Program Never
-main = App.beginnerProgram { model = 0, view = view, update = update }
+main =
+    App.beginnerProgram { model = 0, view = view, update = update }
+
 
 type Msg = Increment | Decrement | SetValue String
+
 
 update : Msg -> Int -> Int
 update msg model =
@@ -25,6 +28,7 @@ update msg model =
 
         Err _ ->
           0
+
 
 view : a -> Html Msg
 view model =
