@@ -1,8 +1,8 @@
-import String exposing (toInt)
+import String exposing (toInt, isEmpty)
 import Html exposing (Html, button, input, div, form, text, label, br)
 import Html.App as App
 import Html.Events exposing (onClick, onInput)
-import Html.Attributes exposing (type')
+import Html.Attributes exposing (type', disabled)
 
 
 type alias State =
@@ -15,8 +15,9 @@ type alias State =
 initialState : State
 initialState =
   { name = ""
-  , group = Ok 0
-  , turnTime = Ok 0 }
+  , group = Err ""
+  , turnTime = Err ""
+  }
 
 
 type Msg = SetName String | SetGroup String | SetTurnTime String
@@ -40,28 +41,49 @@ update msg model =
       { model | turnTime = toInt turnTime }
 
 
+successful : Result a b -> Bool
+successful res =
+    case res of
+        Ok a ->
+            True
+
+        Err b ->
+            False
+
+
 view : State -> Html Msg
 view {name, group, turnTime} =
-  form []
-    [ label []
-        [ text "Name"
-        , input [ type' "text", onInput SetName ] []
-        ]
-    , text name
-    , br [] []
-    , label []
+  let
+    nameGiven =
+        not <| isEmpty name
+
+    groupIdGiven =
+        successful group
+
+    turnTimeGiven =
+        successful turnTime
+
+  in
+    form []
+      [ label []
+          [ text "Name"
+          , input [ type' "text", onInput SetName ] []
+          ]
+      , br [] []
+      , label []
         [ text "Group Id"
         , input [ type' "number", onInput SetGroup ] []
         ]
-    , text (case group of
-               Ok x -> toString x
-               Err e -> e)
-    , br [] []
-    , label []
-        [ text "Turn Time"
-        , input [ type' "number", onInput SetTurnTime ] []
-        ]
-    , text (case turnTime of
-               Ok x -> toString x
-               Err e -> e)
-    ]
+      , br [] []
+      , text (toString groupIdGiven)
+      , button [disabled <| not (nameGiven && groupIdGiven)]
+          [text "Join Group"]
+      , br [] []
+      , label []
+          [ text "Turn Time"
+          , input [ type' "number", onInput SetTurnTime ] []
+          ]
+      , br [] []
+      , button [disabled <| not (nameGiven && groupIdGiven && turnTimeGiven)]
+          [text "Create Group"]
+      ]
