@@ -1,14 +1,13 @@
 # turntimer-clj
 
-A Clojure library designed to ... well, that part is up to you.
+Turntimer API server implemented in clojure
 
 ## Usage
 
-FIXME
+
 
 ## License
 
-Copyright © 2016 FIXME
+Copyright © 2016 George Pittarelli
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Distributed under the GPLv3 License
