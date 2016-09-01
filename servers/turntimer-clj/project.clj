@@ -3,4 +3,8 @@
   :url "http://example.com/FIXME"
   :license {:name "GNU General Public License v3.0"
             :url "http://www.gnu.org/licenses/gpl-3.0.txt"}
-  :dependencies [[org.clojure/clojure "1.8.0"]])
+  :main turntimer-clj.core
+  :dependencies
+  [[org.clojure/clojure "1.8.0"]
+   [http-kit "2.1.18"]
+   [environ "1.1.0"]])
