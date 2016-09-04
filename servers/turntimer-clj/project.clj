@@ -7,4 +7,5 @@
   :dependencies
   [[org.clojure/clojure "1.8.0"]
    [http-kit "2.1.18"]
-   [environ "1.1.0"]])
+   [environ "1.1.0"]
+   [bidi "2.0.10"]])
