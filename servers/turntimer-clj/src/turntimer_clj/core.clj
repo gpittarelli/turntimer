@@ -17,7 +17,7 @@
 ; "/group" {["/" :id] group}
 (def routes
   [["group"
-    {["/" id] group}]
+    {["/" :id] group}]
    [true index]])
 
 (def app (-> (make-handler ["/" routes])))
