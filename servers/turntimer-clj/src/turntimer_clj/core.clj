@@ -8,12 +8,30 @@
    :headers {"Content-Type" "text/html"}
    :body    "hello HTTP!"})
 
-(def routes
-  ["/" index])
+(defn group [req]
+  (println req)
+  {:status  200
+   :headers {"Content-Type" "text/html"}
+   :body    "hello group"})
 
-(def app (-> (make-handler routes)))
+; "/group" {["/" :id] group}
+(def routes
+  [["group"
+    {["/" id] group}]
+   [true index]])
+
+(def app (-> (make-handler ["/" routes])))
+
+(defonce server (atom nil))
+
+(defn stop-server []
+  (when-not (nil? @server)
+    ;; graceful shutdown: wait 100ms for existing requests to be finished
+    ;; :timeout is optional, when no timeout, stop immediately
+    (@server :timeout 100)
+    (reset! server nil)))
 
 (defn -main [& args]
   (let [port (or (env :port 8080))]
-    (run-server app {:port port})
+    (reset! server (run-server #'app {:port port}))
     (println "Lisenting on port" port)))
