@@ -2,6 +2,12 @@
 :group-id = 123
 :username = bob
 
+# Root
+GET :host/
+
+# bad api route
+GET :host/api/asdfa
+
 # Create a group
 POST :host/api/group/:group-id?turnTime=45
 

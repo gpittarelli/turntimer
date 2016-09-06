@@ -1,26 +1,31 @@
 (ns turntimer-clj.core
   (:require [environ.core :refer [env]]
             [org.httpkit.server :refer [run-server]]
-            [bidi.ring :refer [make-handler]]))
+            [bidi.ring :refer [make-handler]]
+            [ring.util.response :refer [not-found]]))
+
+(def groups (atom {}))
 
 (defn index [req]
   {:status  200
    :headers {"Content-Type" "text/html"}
    :body    "hello HTTP!"})
 
-(defn group [req]
-  (println req)
-  {:status  200
-   :headers {"Content-Type" "text/html"}
-   :body    "hello group"})
+(defn get-group [{{id :id} :route-params :as req}]
+    (println @groups)
+  (let [group (get @groups id)]
+    (if group
+      {:status 200 :body group}
+      (not-found "Group does not exist.\n"))))
 
-; "/group" {["/" :id] group}
-(def routes
-  [["group"
-    {["/" :id] group}]
-   [true index]])
+(defn create-group [{{id :id} :route-params :as req}]
+  (swap! groups assoc id {:id id})
+  (get-group req))
 
-(def app (-> (make-handler ["/" routes])))
+(def api-routes
+  [[["group/" :id] {:post create-group :get get-group}]])
+
+(def app (make-handler ["/api/" api-routes]))
 
 (defonce server (atom nil))
 
