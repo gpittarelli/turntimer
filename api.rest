@@ -1,9 +1,9 @@
-:host = http://localhost:8081
+:host = http://localhost:8080
 :group-id = 123
 :username = bob
 
 # Create a group
-POST :host/api/group/:group-id
+POST :host/api/group/:group-id?turnTime=45
 
 # Get a group
 GET :host/api/group/:group-id
