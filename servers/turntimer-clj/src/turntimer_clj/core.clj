@@ -2,7 +2,8 @@
   (:require [environ.core :refer [env]]
             [org.httpkit.server :refer [run-server]]
             [bidi.ring :refer [make-handler]]
-            [ring.util.response :refer [not-found]]))
+            [ring.util.response :refer [not-found]]
+            [ring.middleware.json :refer [wrap-json-response wrap-json-body]]))
 
 (def groups (atom {}))
 
@@ -12,7 +13,6 @@
    :body    "hello HTTP!"})
 
 (defn get-group [{{id :id} :route-params :as req}]
-    (println @groups)
   (let [group (get @groups id)]
     (if group
       {:status 200 :body group}
@@ -25,7 +25,10 @@
 (def api-routes
   [[["group/" :id] {:post create-group :get get-group}]])
 
-(def app (make-handler ["/api/" api-routes]))
+(def app
+  (-> (make-handler ["/api/" api-routes])
+      wrap-json-response
+      wrap-json-body))
 
 (defonce server (atom nil))
 
