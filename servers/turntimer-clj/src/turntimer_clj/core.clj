@@ -19,11 +19,17 @@
       (not-found "Group does not exist.\n"))))
 
 (defn create-group [{{id :id} :route-params :as req}]
-  (swap! groups assoc id {:id id})
+  (swap! groups assoc id {:id id :players #{}})
+  (get-group req))
+
+(defn add-player
+  [{{group-id :id player-name :name} :route-params :as req}]
+  (swap! groups update-in [group-id :players] conj player-name)
   (get-group req))
 
 (def api-routes
-  [[["group/" :id] {:post create-group :get get-group}]])
+  [[["group/" :id] [[["/player/" :name] {:post add-player}]
+                    [#{"/" ""} {:post create-group :get get-group}]]]])
 
 (def app
   (-> (make-handler ["/api/" api-routes])
