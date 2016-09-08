@@ -2,7 +2,7 @@
   (:require [environ.core :refer [env]]
             [org.httpkit.server :refer [run-server]]
             [bidi.ring :refer [make-handler]]
-            [ring.util.response :refer [not-found]]
+            [ring.util.response :refer [not-found response]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]))
 
 (def groups (atom {}))
@@ -15,7 +15,7 @@
 (defn get-group [{{id :id} :route-params :as req}]
   (let [group (get @groups id)]
     (if group
-      {:status 200 :body group}
+      (response group)
       (not-found "Group does not exist.\n"))))
 
 (defn create-group [{{id :id} :route-params :as req}]
