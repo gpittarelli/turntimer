@@ -5,6 +5,16 @@
             [ring.util.response :refer [not-found response]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]))
 
+;; comparator for pairs (aka [some-value
+;; some-ordering-value])
+(defn compare-pair [[a b] [a' b']]
+  (let [c (compare b b')]
+    (if-not (zero? c)
+      c
+      (compare a a'))))
+
+(defn- millis [] (System/currentTimeMillis))
+
 (def groups (atom {}))
 
 (defn index [req]
@@ -15,11 +25,22 @@
 (defn get-group [{{id :id} :route-params :as req}]
   (let [group (get @groups id)]
     (if group
-      (response group)
+      (let [{:keys [players start-time]} group
+            dt (- (millis) start-time)
+            cnt-players (count players)
+            current-turn (when-not (zero? cnt-players)
+                           (mod (quot dt 1000) cnt-players))]
+        (-> group
+            (assoc :current-turn current-turn)
+            (update :players (partial map first))
+            response))
       (not-found "Group does not exist.\n"))))
 
 (defn create-group [{{id :id} :route-params :as req}]
-  (swap! groups assoc id {:id id :players #{}})
+  (swap! groups assoc id
+         {:id id
+          :players (sorted-set-by (comp < second))
+          :start-time (millis)})
   (get-group req))
 
 (defn add-player
