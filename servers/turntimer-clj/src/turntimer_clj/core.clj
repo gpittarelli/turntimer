@@ -45,16 +45,16 @@
     :as req}]
   (swap! groups assoc id
          {:id id
-          :players (sorted-set-by (comp < second))
           :turn-time (if turn-time
                        (str->int turn-time)
                        60)
+          :players (sorted-set-by compare-pair)
           :start-time (millis)})
   (get-group req))
 
 (defn add-player
   [{{group-id :id player-name :name} :route-params :as req}]
-  (swap! groups update-in [group-id :players] conj player-name)
+  (swap! groups update-in [group-id :players] conj [player-name (millis)])
   (get-group req))
 
 (def api-routes
