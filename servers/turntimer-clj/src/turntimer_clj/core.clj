@@ -3,7 +3,8 @@
             [org.httpkit.server :refer [run-server]]
             [bidi.ring :refer [make-handler]]
             [ring.util.response :refer [not-found response]]
-            [ring.middleware.json :refer [wrap-json-response wrap-json-body]]))
+            [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
+            [ring.middleware.params :refer [wrap-params]]))
 
 ;; comparator for pairs (aka [some-value
 ;; some-ordering-value])
@@ -55,7 +56,8 @@
 (def app
   (-> (make-handler ["/api/" api-routes])
       wrap-json-response
-      wrap-json-body))
+      wrap-json-body
+      wrap-params))
 
 (defonce server (atom nil))
 
