@@ -28,14 +28,16 @@
 (defn get-group [{{id :id} :route-params :as req}]
   (let [group (get @groups id)]
     (if group
-      (let [{:keys [players start-time turn-time]} group
+      (let [{:keys [users start-time turn-time]} group
             dt (- (millis) start-time)
-            cnt-players (count players)
-            current-turn (when-not (zero? cnt-players)
-                           (mod (quot dt (* 1000 turn-time)) cnt-players))]
+            cnt-users (count users)
+            time-left (quot dt (* 1000 turn-time))
+            active-turn (when-not (zero? cnt-users)
+                           (mod time-left cnt-users))]
         (-> group
-            (assoc :current-turn current-turn)
-            (update :players (partial map first))
+            (assoc :active-turn active-turn
+                   :time-left time-left)
+            (update :users (partial map first))
             response))
       (not-found "Group does not exist.\n"))))
 
@@ -48,13 +50,13 @@
           :turn-time (if turn-time
                        (str->int turn-time)
                        60)
-          :players (sorted-set-by compare-pair)
+          :users (sorted-set-by compare-pair)
           :start-time (millis)})
   (get-group req))
 
 (defn add-player
   [{{group-id :id player-name :name} :route-params :as req}]
-  (swap! groups update-in [group-id :players] conj [player-name (millis)])
+  (swap! groups update-in [group-id :users] conj [player-name (millis)])
   (get-group req))
 
 (def api-routes
