@@ -1,5 +1,6 @@
 (ns turntimer-clj.core
-  (:require [environ.core :refer [env]]
+  (:require [clojure.string :as string]
+            [environ.core :refer [env]]
             [org.httpkit.server :refer [run-server]]
             [bidi.ring :refer [make-handler]]
             [ring.util.response :refer [not-found response]]
@@ -8,9 +9,17 @@
 
 (defn- str->int [str] (->> str (re-find #"\d+") read-string))
 
+(defn- camel-case
+  "converts some-snakecase-name to someSnakecaseName"
+  [s]
+  (let [[x & xs] (string/split s #"-")]
+    (str x (apply str (map string/capitalize xs)))))
+
+(defn- map-keys [f o] (->> o (map (fn [[k v]] [(f k) v])) (into {})))
+
 ;; comparator for pairs (aka [some-value
 ;; some-ordering-value])
-(defn compare-pair [[a b] [a' b']]
+(defn- compare-pair [[a b] [a' b']]
   (let [c (compare b b')]
     (if-not (zero? c)
       c
@@ -38,6 +47,7 @@
             (assoc :active-turn active-turn
                    :time-left time-left)
             (update :users (partial map first))
+            (->> (map-keys (comp camel-case name)))
             response))
       (not-found "Group does not exist.\n"))))
 
