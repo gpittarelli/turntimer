@@ -44,15 +44,16 @@
 (defn get-group [{{id :id} :route-params :as req}]
   (let [group (get @groups id)]
     (if group
-      (let [{:keys [users start-time turn-time]} group
+      (let [{:keys [users start-time active-turn turn-time]} group
             dt (- (millis) start-time)
             cnt-users (count users)
-            time-left (- turn-time (mod (quot dt 1000) turn-time))
-            active-turn (when-not (zero? cnt-users)
-                          (mod (quot dt (* 1000 turn-time)) cnt-users))]
+            time-left (- turn-time (quot dt 1000))]
         (-> group
-            (assoc :active-turn active-turn
-                   :time-left time-left)
+            (dissoc :start-time)
+            (update :active-turn #(if-not (zero? cnt-users)
+                                    (mod % cnt-users)
+                                    0))
+            (assoc :time-left time-left)
             (update :users #(map (fn [[name]] {:name name}) %))
             (->> (walk-map-keys (comp camel-case name)))
             response))
@@ -67,6 +68,7 @@
           :turn-time (if turn-time
                        (str->int turn-time)
                        60)
+          :active-turn 0
           :users (sorted-set-by compare-pair)
           :start-time (millis)})
   (get-group req))
@@ -81,10 +83,18 @@
                             (fn [[name]] (not= name player-name)) %))
                (update-in [group-id :users] conj [player-name (millis)]))))
   (get-group req))
+
+(defn next-player
+  [{{group-id :id} :route-params :as req}]
+  (swap! groups
+         #(-> %
+              (update-in [group-id :active-turn] inc)
+              (update-in [group-id :start-time] (fn [_] (millis)))))
   (get-group req))
 
 (def api-routes
-  [[["group/" :id] [[["/player/" :name] {:post add-player}]
+  [[["group/" :id] [[["/player/" :name] [["/endTurn" {:post next-player}]
+                                         ["" {:post add-player}]]]
                     [#{"/" ""} {:post create-group :get get-group}]]]])
 
 (def app
