@@ -9,7 +9,7 @@ GET :host/
 GET :host/api/asdfa
 
 # Create a group
-POST :host/api/group/:group-id?turnTime=45
+POST :host/api/group/:group-id?turnTime=5
 
 # Get a group
 GET :host/api/group/:group-id
@@ -17,5 +17,11 @@ GET :host/api/group/:group-id
 # Create a player in a group
 POST :host/api/group/:group-id/player/:username
 
-# Get a player in a group
-GET :host/api/group/:group-id/player/:username
+# Create a player in a group
+POST :host/api/group/:group-id/player/:username2
+
+# Create a player in a group
+POST :host/api/group/:group-id/player/:username3
+
+# Signal the nextturn
+POST :host/api/group/:group-id/player/:username/endTurn
