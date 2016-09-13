@@ -66,6 +66,8 @@
 
 (defn add-player
   [{{group-id :id player-name :name} :route-params :as req}]
+  (swap! groups update-in [group-id :users]
+         #(clojure.set/select (fn [[name]] (not= name player-name)) %))
   (swap! groups update-in [group-id :users] conj [player-name (millis)])
   (get-group req))
 
