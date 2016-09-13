@@ -91,7 +91,7 @@
     (reset! server nil)))
 
 (defn -main [& args]
-  (let [port (or (env :port 8080))]
+  (let [port (str->int (env :port 8080))]
     (reset! server (run-server #'app {:port port}))
     (println "Lisenting on port" port)))
 
