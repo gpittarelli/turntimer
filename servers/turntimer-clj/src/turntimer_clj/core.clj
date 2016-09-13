@@ -7,6 +7,15 @@
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
             [ring.middleware.params :refer [wrap-params]]))
 
+;; modified from clojure.walk/stringify-keys
+(defn walk-map-keys
+  "Recursively transforms all map keys with f"
+  {:added "1.1"}
+  [xform m]
+  (let [f (fn [[k v]] (if (keyword? k) [(xform k) v] [k v]))]
+    ;; only apply to maps
+    (clojure.walk/postwalk (fn [x] (if (map? x) (into {} (map f x)) x)) m)))
+
 (defn- str->int [str] (->> str (re-find #"\d+") read-string))
 
 (defn- camel-case
@@ -14,8 +23,6 @@
   [s]
   (let [[x & xs] (string/split s #"-")]
     (str x (apply str (map string/capitalize xs)))))
-
-(defn- map-keys [f o] (->> o (map (fn [[k v]] [(f k) v])) (into {})))
 
 ;; comparator for pairs (aka [some-value
 ;; some-ordering-value])
@@ -40,14 +47,14 @@
       (let [{:keys [users start-time turn-time]} group
             dt (- (millis) start-time)
             cnt-users (count users)
-            time-left (quot dt (* 1000 turn-time))
+            time-left (- turn-time (mod (quot dt 1000) turn-time))
             active-turn (when-not (zero? cnt-users)
-                           (mod time-left cnt-users))]
+                          (mod (quot dt (* 1000 turn-time)) cnt-users))]
         (-> group
             (assoc :active-turn active-turn
                    :time-left time-left)
-            (update :users (partial map first))
-            (->> (map-keys (comp camel-case name)))
+            (update :users #(map (fn [[name]] {:name name}) %))
+            (->> (walk-map-keys (comp camel-case name)))
             response))
       (not-found "Group does not exist.\n"))))
 
